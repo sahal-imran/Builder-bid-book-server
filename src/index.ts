@@ -41,7 +41,7 @@ mongoose
         });
         // LogInfo("Path", __dirname)
         // Auth Routes
-        app.use(require("./routes/auth"));
+        // app.use(require("./routes/auth"));
     })
     .catch((err) => {
         console.log(err);
