@@ -9,6 +9,7 @@
     "mongoose": "^7.3.0",
     "path": "^0.12.7",
     "pre-commit": "^1.2.2"
+    "node js": "v16.14.1"
     
 ## Stack:
     Node js script with Express JS as routes handling along with JWToken authantication.
