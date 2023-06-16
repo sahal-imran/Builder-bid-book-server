@@ -13,21 +13,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-// Instances
+const User_1 = __importDefault(require("../../models/User"));
+// Instance of express router
 const router = express_1.default.Router();
-// Sign up
-router.get("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-    }
-    catch (error) {
-    }
-}));
-// Sign up
-router.get("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-    }
-    catch (error) {
-    }
-}));
+router.get("/users", function (req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const users = yield User_1.default.find();
+            res.status(200).json({
+                status: "success",
+                message: "Users fetched successfully.",
+                data: {
+                    users,
+                },
+            });
+        }
+        catch (err) {
+            res.status(400).json({
+                status: "fail",
+                message: "Failed get users data",
+            });
+        }
+    });
+});
 exports.default = router;
-//# sourceMappingURL=auth.js.map
+//# sourceMappingURL=users.js.map

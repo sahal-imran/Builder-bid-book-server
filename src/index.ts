@@ -1,10 +1,12 @@
-import 'dotenv/config';
-import express from 'express';
-import mongoose from "mongoose"
-import cors from "cors"
-import cookieParser from 'cookie-parser'
-import path from "path"
-import { LogInfo } from './utils/Log';
+import "dotenv/config";
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import path from "path";
+import authRoute from "./routes/auth";
+import usersRoute from "./routes/users";
+import { LogInfo } from "./utils/Log";
 
 let PORT = process.env.APP_LISTEN_PORT || 4000;
 let MODE = process.env.MODE;
@@ -14,35 +16,37 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(
-    cors({
-        origin:
-            MODE === "dev"
-                ? process.env.REQUEST_ORIGIN_DEVELOPMENT
-                : process.env.REQUEST_ORIGIN_PRODUCTION,
-        credentials: true, //access-control-allow-credentials:true
-    })
+  cors({
+    origin:
+      MODE === "dev"
+        ? process.env.REQUEST_ORIGIN_DEVELOPMENT
+        : process.env.REQUEST_ORIGIN_PRODUCTION,
+    credentials: true, //access-control-allow-credentials:true
+  })
 );
 
 // Home route
 app.get("/", async (req, res) => {
-    // res.send(path.join(__dirname, "../index.html"));
-    res.send(`Running on port ${PORT}`);
+  // res.send(path.join(__dirname, "../index.html"));
+  res.send(`Running on port ${PORT}`);
 });
 
-const URL: any = MODE === "dev"
+const URL: any =
+  MODE === "dev"
     ? process.env.DATABASE_URL_DEVELOPMENT
-    : process.env.DATABASE_URL_PRODUCTION
+    : process.env.DATABASE_URL_PRODUCTION;
 mongoose
-    .connect(URL, {
-    })
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`app is listing on port ${PORT}`);
-        });
-        // LogInfo("Path", __dirname)
-        // Auth Routes
-        // app.use(require("./routes/auth"));
-    })
-    .catch((err) => {
-        console.log(err);
+  .connect(URL, {})
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`app is listing on port ${PORT}`);
     });
+    LogInfo("Path", __dirname);
+    // Auth Routes
+    app.use(authRoute);
+    // Users Route
+    app.use(usersRoute);
+  })
+  .catch((err) => {
+    console.log(err);
+  });

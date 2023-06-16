@@ -17,6 +17,9 @@ const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const auth_1 = __importDefault(require("./routes/auth"));
+const users_1 = __importDefault(require("./routes/users"));
+const Log_1 = require("./utils/Log");
 let PORT = process.env.APP_LISTEN_PORT || 4000;
 let MODE = process.env.MODE;
 const app = (0, express_1.default)();
@@ -42,9 +45,11 @@ mongoose_1.default
     app.listen(PORT, () => {
         console.log(`app is listing on port ${PORT}`);
     });
-    // LogInfo("Path", __dirname)
+    (0, Log_1.LogInfo)("Path", __dirname);
     // Auth Routes
-    // app.use(require("./routes/auth"));
+    app.use(auth_1.default);
+    // Users Route
+    app.use(users_1.default);
 })
     .catch((err) => {
     console.log(err);
