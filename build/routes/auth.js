@@ -22,4 +22,12 @@ router.get("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* 
     catch (error) {
     }
 }));
+// Sign up
+router.get("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+    }
+    catch (error) {
+    }
+}));
+exports.default = router;
 //# sourceMappingURL=auth.js.map
