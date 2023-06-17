@@ -13,8 +13,8 @@ const router = express.Router();
 router.get("/signup", async (req: Request, res: Response) => {
     try {
         const body = req.body;
-        // const password = await bcrypt.hash(body.password, 12)
-        const createUser = await User.create(body);
+        const password = await bcrypt.hash(body.password, 10)
+        const createUser = await User.create({ ...body, password });
         sendMail(createUser?.companyEmail, "Welcome", "Hi Welcome to the app", (error) => {
             if (error) LogError("/signup(sendMail)", error)
             res.status(201).json({ message: "Registered" })

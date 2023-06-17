@@ -17,14 +17,15 @@ const Log_1 = require("../utils/Log");
 const User_1 = __importDefault(require("../models/User"));
 const MongoDBErrorController_1 = __importDefault(require("../utils/MongoDBErrorController"));
 const sendMail_1 = __importDefault(require("../lib/sendMail"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 // Instances
 const router = express_1.default.Router();
 // Sign up
 router.get("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const body = req.body;
-        // const password = await bcrypt.hash(body.password, 12)
-        const createUser = yield User_1.default.create(body);
+        const password = yield bcrypt_1.default.hash(body.password, 10);
+        const createUser = yield User_1.default.create(Object.assign(Object.assign({}, body), { password }));
         (0, sendMail_1.default)(createUser === null || createUser === void 0 ? void 0 : createUser.companyEmail, "Welcome", "Hi Welcome to the app", (error) => {
             if (error)
                 (0, Log_1.LogError)("/signup(sendMail)", error);
