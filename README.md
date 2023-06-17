@@ -12,4 +12,4 @@
     "node js": "v16.14.1"
     
 ## Stack:
-    Node js script with Express JS as routes handling along with JWToken authantication.
+    Node js script with Express JS as routes handling along with JWToken authentication.
