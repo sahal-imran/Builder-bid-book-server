@@ -14,9 +14,9 @@ const handleValidationError = (err: any) => {
     let fields = Object.values(err.errors).map((el: any) => el.path);
     if (errors.length > 1) {
         const formattedErrors = errors.join(' ');
-        return { messages: formattedErrors, field: fields, status: 403, errorType: "validation", message: `Missing, please add ${fields}` } // Validation error
+        return { messages: formattedErrors, field: fields, status: 403, errorType: "validation", message: `Missing! ${fields}` } // Validation error
     } else {
-        return { messages: errors, field: fields, status: 403, errorType: "validation", message: `Invalid, please add ${fields}` } // Validation error
+        return { messages: errors, field: fields, status: 403, errorType: "validation", message: `Missing! ${fields}` } // Validation error
     }
 }
 const MongoDBErrorController = (err: any) => {

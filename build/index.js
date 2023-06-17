@@ -17,6 +17,7 @@ const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const auth_1 = __importDefault(require("./routes/auth"));
 let PORT = process.env.APP_LISTEN_PORT || 4000;
 let MODE = process.env.MODE;
 const app = (0, express_1.default)();
@@ -43,8 +44,7 @@ mongoose_1.default
         console.log(`app is listing on port ${PORT}`);
     });
     // LogInfo("Path", __dirname)
-    // Auth Routes
-    // app.use(require("./routes/auth"));
+    app.use(auth_1.default);
 })
     .catch((err) => {
     console.log(err);

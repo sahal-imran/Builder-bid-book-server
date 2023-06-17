@@ -16,8 +16,8 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const transporter = nodemailer_1.default.createTransport({
     service: "gmail",
     auth: {
-        user: process.env.NEXT_PUBLIC_NODEMAILER_EMAIL,
-        pass: process.env.NEXT_PUBLIC_NODEMAILER_APP_PASSWORD,
+        user: process.env.EMAIL,
+        pass: process.env.APP_PASSWORD,
     },
 });
 const sendMail = (receiver, subject, message, cb) => __awaiter(void 0, void 0, void 0, function* () {

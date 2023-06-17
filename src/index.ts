@@ -4,7 +4,7 @@ import mongoose from "mongoose"
 import cors from "cors"
 import cookieParser from 'cookie-parser'
 import path from "path"
-import { LogInfo } from './utils/Log';
+import auth from './routes/auth';
 
 let PORT = process.env.APP_LISTEN_PORT || 4000;
 let MODE = process.env.MODE;
@@ -40,8 +40,7 @@ mongoose
             console.log(`app is listing on port ${PORT}`);
         });
         // LogInfo("Path", __dirname)
-        // Auth Routes
-        // app.use(require("./routes/auth"));
+        app.use(auth);
     })
     .catch((err) => {
         console.log(err);
