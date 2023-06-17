@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import authRoute from "./routes/auth";
 import usersRoute from "./routes/users";
+import generalContractorProposalRoute from "./routes/genralContractorProposal";
 import { LogInfo } from "./utils/Log";
 
 let PORT = process.env.APP_LISTEN_PORT || 4000;
@@ -15,15 +16,15 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin:
-      MODE === "dev"
-        ? process.env.REQUEST_ORIGIN_DEVELOPMENT
-        : process.env.REQUEST_ORIGIN_PRODUCTION,
-    credentials: true, //access-control-allow-credentials:true
-  })
-);
+// app.use(
+//   cors({
+//     origin:
+//       MODE === "dev"
+//         ? process.env.REQUEST_ORIGIN_DEVELOPMENT
+//         : process.env.REQUEST_ORIGIN_PRODUCTION,
+//     credentials: true, //access-control-allow-credentials:true
+//   })
+// );
 
 // Home route
 app.get("/", async (req, res) => {
@@ -46,6 +47,8 @@ mongoose
     app.use(authRoute);
     // Users Route
     app.use(usersRoute);
+    // general contractor proposals route
+    app.use(generalContractorProposalRoute);
   })
   .catch((err) => {
     console.log(err);

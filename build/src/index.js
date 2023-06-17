@@ -15,22 +15,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const users_1 = __importDefault(require("./routes/users"));
+const genralContractorProposal_1 = __importDefault(require("./routes/genralContractorProposal"));
 const Log_1 = require("./utils/Log");
 let PORT = process.env.APP_LISTEN_PORT || 4000;
 let MODE = process.env.MODE;
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
-app.use((0, cors_1.default)({
-    origin: MODE === "dev"
-        ? process.env.REQUEST_ORIGIN_DEVELOPMENT
-        : process.env.REQUEST_ORIGIN_PRODUCTION,
-    credentials: true, //access-control-allow-credentials:true
-}));
+// app.use(
+//   cors({
+//     origin:
+//       MODE === "dev"
+//         ? process.env.REQUEST_ORIGIN_DEVELOPMENT
+//         : process.env.REQUEST_ORIGIN_PRODUCTION,
+//     credentials: true, //access-control-allow-credentials:true
+//   })
+// );
 // Home route
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // res.send(path.join(__dirname, "../index.html"));
@@ -50,6 +53,8 @@ mongoose_1.default
     app.use(auth_1.default);
     // Users Route
     app.use(users_1.default);
+    // general contractor proposals route
+    app.use(genralContractorProposal_1.default);
 })
     .catch((err) => {
     console.log(err);
