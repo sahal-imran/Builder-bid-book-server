@@ -53,12 +53,13 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
 router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
-        const userSession = yield User_1.default.findOne({ companyEmail: email });
-        if (userSession) {
-            const match = (0, md5_1.default)(password) === userSession.password;
+        const currentUser = yield User_1.default.findOne({ companyEmail: email });
+        if (currentUser) {
+            const match = (0, md5_1.default)(password) === currentUser.password;
             if (match) {
-                let token = jsonwebtoken_1.default.sign({ _id: userSession._id }, process.env.SECRET_KEY);
-                yield Session_1.default.create({ user: userSession._id, token }); // store token in Session collection which will expire in 30min
+                let token = jsonwebtoken_1.default.sign({ _id: currentUser._id }, process.env.SECRET_KEY);
+                const userSession = yield Session_1.default.create({ token }); // store token in Session collection which will expire in 30min
+                yield User_1.default.findByIdAndUpdate({ _id: currentUser._id }, { currentSession: userSession._id });
                 res.cookie('jwToken', token, {
                     maxAge: 1800000,
                     httpOnly: true,

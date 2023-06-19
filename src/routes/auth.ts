@@ -42,12 +42,13 @@ router.post("/signup", async (req: Request, res: Response) => {
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
-        const userSession = await User.findOne({ companyEmail: email })
-        if (userSession) {
-            const match = md5(password) === userSession.password;
+        const currentUser = await User.findOne({ companyEmail: email })
+        if (currentUser) {
+            const match = md5(password) === currentUser.password;
             if (match) {
-                let token = jwt.sign({ _id: userSession._id }, process.env.SECRET_KEY);
-                await Session.create({ user: userSession._id, token }); // store token in Session collection which will expire in 30min
+                let token = jwt.sign({ _id: currentUser._id }, process.env.SECRET_KEY);
+                const userSession = await Session.create({ token }); // store token in Session collection which will expire in 30min
+                await User.findByIdAndUpdate({ _id: currentUser._id }, { currentSession: userSession._id })
                 res.cookie('jwToken', token, {
                     maxAge: 1800000, // Cookie expiration time (in milliseconds)
                     httpOnly: true, // Restrict cookie access to HTTP only

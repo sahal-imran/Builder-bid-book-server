@@ -3,11 +3,6 @@ import jwt from "jsonwebtoken";
 import { LogError } from "../utils/Log";
 
 const sessionSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Types.ObjectId,
-        ref: 'User',
-        default: null,
-    },
     token: {
         type: String,
         default: null
