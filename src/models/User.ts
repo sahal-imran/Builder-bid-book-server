@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
-import { LogError } from "../utils/Log";
 
 const userSchema = new mongoose.Schema({
     companyName: {
@@ -43,27 +41,18 @@ const userSchema = new mongoose.Schema({
         required: true,
         lowercase: true,
     },
-    token: {
-        type: String,
-        default: null
-    },
     subscription: {
         type: Array,
         default: null
+    },
+    createdAt: { type: Date, default: new Date().toISOString() },
+    updatedAt: { type: Date, default: new Date().toISOString() },
+    lastUpdateBy: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+        default: null,
     }
 });
-
-// ==> When user will login this function will call to generate token and store it in database for authentication
-userSchema.methods.generateAuthToken = async function () {
-    try {
-        let Token = jwt.sign({ _id: this._id }, process.env.SECRET_KEY);
-        this.token = Token;
-        await this.save();
-        return Token;
-    } catch (error) {
-        LogError("Login(generateAuthToken)", error)
-    }
-};
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 
