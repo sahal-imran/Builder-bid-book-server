@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
-import { LogError } from "../utils/Log";
 
 const sessionSchema = new mongoose.Schema({
     token: {
