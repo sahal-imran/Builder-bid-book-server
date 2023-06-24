@@ -49,11 +49,6 @@ const userSchema = new mongoose_1.default.Schema({
         type: Array,
         default: null
     },
-    currentSession: {
-        type: mongoose_1.default.Types.ObjectId,
-        ref: 'Session',
-        default: null,
-    },
     createdAt: { type: Date, default: new Date().toISOString() },
     updatedAt: { type: Date, default: new Date().toISOString() },
     lastUpdateBy: {

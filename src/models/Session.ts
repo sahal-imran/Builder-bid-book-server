@@ -5,6 +5,11 @@ const sessionSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    user: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+        default: null,
+    },
     expireAt: {
         type: Date,
         default: Date.now(),

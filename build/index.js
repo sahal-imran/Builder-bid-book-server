@@ -18,6 +18,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const auth_1 = __importDefault(require("./routes/auth"));
+const post_1 = __importDefault(require("./routes/post"));
 let PORT = process.env.APP_LISTEN_PORT || 4000;
 let MODE = process.env.MODE;
 const app = (0, express_1.default)();
@@ -45,6 +46,7 @@ mongoose_1.default
     });
     // LogInfo("Path", __dirname)
     app.use(auth_1.default);
+    app.use(post_1.default);
 })
     .catch((err) => {
     console.log(err);

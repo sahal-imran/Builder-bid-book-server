@@ -5,6 +5,7 @@ import cors from "cors"
 import cookieParser from 'cookie-parser'
 import path from "path"
 import auth from './routes/auth';
+import post from './routes/post';
 
 let PORT = process.env.APP_LISTEN_PORT || 4000;
 let MODE = process.env.MODE;
@@ -41,6 +42,7 @@ mongoose
         });
         // LogInfo("Path", __dirname)
         app.use(auth);
+        app.use(post);
     })
     .catch((err) => {
         console.log(err);
