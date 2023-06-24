@@ -40,5 +40,32 @@ router.post("/post", authenticate_1.default, (req, res) => __awaiter(void 0, voi
         }
     }
 }));
+// Get all posts with pagination
+router.get("/post", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { page } = req.query.page;
+        const pageNumber = parseInt(page);
+        const recordsPerPage = 10;
+        const posts = yield Post_1.default.find().limit(recordsPerPage * 1).skip((pageNumber - 1) * recordsPerPage).exec();
+        const totalRecords = yield Post_1.default.find().count();
+        res.status(200).json({ posts, totalRecords });
+    }
+    catch (error) {
+        (0, Log_1.LogError)("/post/:page", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}));
+// get Single post by id
+router.get("/post/:id", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const post = yield Post_1.default.findById({ _id: id });
+        res.status(200).json({ post });
+    }
+    catch (error) {
+        (0, Log_1.LogError)("/postById/:id", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}));
 exports.default = router;
 //# sourceMappingURL=post.js.map

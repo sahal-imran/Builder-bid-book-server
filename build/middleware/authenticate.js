@@ -19,7 +19,6 @@ const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     try {
         const token = req.cookies.jwToken;
         const found = yield Session_1.default.findOne({ token }).populate("user");
-        console.log(req.route);
         if (found) {
             req.user = found === null || found === void 0 ? void 0 : found.user;
             next();

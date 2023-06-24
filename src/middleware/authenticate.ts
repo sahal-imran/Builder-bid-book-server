@@ -12,7 +12,6 @@ const authenticate = async (req: IRequest, res: Response, next: NextFunction) =>
     try {
         const token: string = req.cookies.jwToken;
         const found: any = await Session.findOne({ token }).populate("user");
-        console.log(req.route);
         if (found) {
             req.user = found?.user
             next();

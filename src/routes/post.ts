@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { LogError, LogWarning } from '../utils/Log';
+import { LogError, LogInfo, LogWarning } from '../utils/Log';
 import MongoDBErrorController from '../utils/MongoDBErrorController';
 import Post from '../models/Post';
 import authenticate from '../middleware/authenticate';
@@ -27,6 +27,33 @@ router.post("/post", authenticate, async (req: IRequest, res: Response) => {
             LogError("/post", error)
             res.status(500).json({ message: "Server error" })
         }
+    }
+})
+
+// Get all posts with pagination
+router.get("/post", authenticate, async (req: IRequest, res: Response) => {
+    try {
+        const { page }: any = req.query.page;
+        const pageNumber = parseInt(page)
+        const recordsPerPage = 10;
+        const posts = await Post.find().limit(recordsPerPage * 1).skip((pageNumber - 1) * recordsPerPage).exec();
+        const totalRecords = await Post.find().count()
+        res.status(200).json({ posts, totalRecords })
+    } catch (error) {
+        LogError("/post/:page", error)
+        res.status(500).json({ message: "Server error" })
+    }
+})
+
+// get Single post by id
+router.get("/post/:id", authenticate, async (req: IRequest, res: Response) => {
+    try {
+        const { id } = req.params;
+        const post = await Post.findById({ _id: id })
+        res.status(200).json({ post })
+    } catch (error) {
+        LogError("/postById/:id", error)
+        res.status(500).json({ message: "Server error" })
     }
 })
 
