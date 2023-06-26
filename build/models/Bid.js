@@ -10,7 +10,7 @@ const bidSchema = new mongoose_1.default.Schema({
         ref: 'Post',
         required: true
     },
-    SB: {
+    SC: {
         type: mongoose_1.default.Types.ObjectId,
         ref: 'User',
         required: true

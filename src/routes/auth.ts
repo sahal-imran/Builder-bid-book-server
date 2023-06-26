@@ -25,11 +25,11 @@ router.post("/signup", async (req: Request, res: Response) => {
         const errorHandler: any = MongoDBErrorController(error)
         if (errorHandler.status === 403) {
             LogWarning("/signup(Validation)", errorHandler.message)
-            res.status(errorHandler.status).json({ message: errorHandler.message })
+            res.status(errorHandler?.status).json({ message: errorHandler.message })
         }
         else if (errorHandler.status === 409) {
             LogWarning("/signup(Duplication)", errorHandler.message)
-            res.status(errorHandler.status).json({ message: errorHandler.message })
+            res.status(errorHandler?.status).json({ message: errorHandler.message })
         }
         else {
             LogError("(auth)/signup", error)

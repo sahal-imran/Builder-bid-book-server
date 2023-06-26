@@ -6,7 +6,7 @@ const bidSchema = new mongoose.Schema({
         ref: 'Post',
         required: true
     },
-    SB: { // SubContractor who bided
+    SC: { // SubContractor who bided
         type: mongoose.Types.ObjectId,
         ref: 'User',
         required: true
@@ -16,7 +16,7 @@ const bidSchema = new mongoose.Schema({
         required: true
     },
     attachment: {
-        type: String, // it will be URL pdf
+        type: String, // it will be URL of pdf
         required: true
     },
     createdAt: { type: Date, default: new Date().toISOString() },

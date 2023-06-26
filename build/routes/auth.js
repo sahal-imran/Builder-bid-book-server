@@ -37,11 +37,11 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
         const errorHandler = (0, MongoDBErrorController_1.default)(error);
         if (errorHandler.status === 403) {
             (0, Log_1.LogWarning)("/signup(Validation)", errorHandler.message);
-            res.status(errorHandler.status).json({ message: errorHandler.message });
+            res.status(errorHandler === null || errorHandler === void 0 ? void 0 : errorHandler.status).json({ message: errorHandler.message });
         }
         else if (errorHandler.status === 409) {
             (0, Log_1.LogWarning)("/signup(Duplication)", errorHandler.message);
-            res.status(errorHandler.status).json({ message: errorHandler.message });
+            res.status(errorHandler === null || errorHandler === void 0 ? void 0 : errorHandler.status).json({ message: errorHandler.message });
         }
         else {
             (0, Log_1.LogError)("(auth)/signup", error);

@@ -39,7 +39,6 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-        lowercase: true,
     },
     subscription: {
         type: Array,
