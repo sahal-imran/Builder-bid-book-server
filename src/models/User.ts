@@ -1,6 +1,16 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
+    firstName: {
+        type: String,
+        required: true,
+        lowercase: true,
+    },
+    lastName: {
+        type: String,
+        required: true,
+        lowercase: true,
+    },
     companyName: {
         type: String,
         required: true,

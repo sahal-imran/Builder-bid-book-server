@@ -17,10 +17,7 @@ app.use(cookieParser());
 
 app.use(
     cors({
-        origin:
-            MODE === "dev"
-                ? process.env.REQUEST_ORIGIN_DEVELOPMENT
-                : process.env.REQUEST_ORIGIN_PRODUCTION,
+        origin:"https://builder-bid-book.vercel.app",
         credentials: true, //access-control-allow-credentials:true
     })
 );
