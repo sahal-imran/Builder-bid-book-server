@@ -3,6 +3,7 @@ import { LogError, LogInfo, LogWarning } from '../utils/Log';
 import MongoDBErrorController from '../utils/MongoDBErrorController';
 import authenticate from '../middleware/authenticate';
 import Bid from '../models/Bid';
+import Post from '../models/Post';
 
 
 const router = express.Router();
@@ -34,14 +35,32 @@ router.post("/bid", authenticate, async (req: IRequest, res: Response) => {
 })
 
 // Get all bids with pagination
-router.get("/bid", authenticate, async (req: IRequest, res: Response) => {
+router.get("/bids", authenticate, async (req: IRequest, res: Response) => {
     if (req?.user?.role !== "subContractor") res.status(401).json({ message: "Oops! Unauthorized, Sub Contractor can bid only!" }) // Unauthorized
     try {
         const { page }: any = req.query.page;
         const pageNumber = parseInt(page)
         const recordsPerPage = 10;
         const bids = await Bid.find().limit(recordsPerPage * 1).skip((pageNumber - 1) * recordsPerPage);
-        const totalRecords = await Bid.find().count()
+        const totalRecords = bids.length;
+        res.status(200).json({ bids, totalRecords })
+    } catch (error) {
+        LogError("/bid/:page", error)
+        res.status(500).json({ message: "Server error" })
+    }
+})
+
+// Get bids/proposal for a specific GC with pagination
+router.get("/GCbids", authenticate, async (req: IRequest, res: Response) => {
+    if (req?.user?.role !== "generalContractor") res.status(401).json({ message: "Oops! Unauthorized, General Contract can his proposals only!" }) // Unauthorized
+    try {
+        const { page }: any = req.query.page;
+        const pageNumber = parseInt(page)
+        const recordsPerPage = 10;
+        const generalContractor_ID = req?.user?._id;
+        const postIDs = await Post.find({ gc: generalContractor_ID }, { _id: 1 }).sort({ createdAt: 1 }).limit(recordsPerPage * 1).skip((pageNumber - 1) * recordsPerPage);
+        const bids = await Bid.find({ post: { $in: postIDs?.map(obj => obj._id) } }).populate("SC").populate("post");
+        const totalRecords = bids.length;
         res.status(200).json({ bids, totalRecords })
     } catch (error) {
         LogError("/bid/:page", error)

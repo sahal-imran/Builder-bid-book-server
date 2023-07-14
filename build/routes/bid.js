@@ -17,6 +17,7 @@ const Log_1 = require("../utils/Log");
 const MongoDBErrorController_1 = __importDefault(require("../utils/MongoDBErrorController"));
 const authenticate_1 = __importDefault(require("../middleware/authenticate"));
 const Bid_1 = __importDefault(require("../models/Bid"));
+const Post_1 = __importDefault(require("../models/Post"));
 const router = express_1.default.Router();
 // Create Bid
 router.post("/bid", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -43,7 +44,7 @@ router.post("/bid", authenticate_1.default, (req, res) => __awaiter(void 0, void
     }
 }));
 // Get all bids with pagination
-router.get("/bid", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/bids", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _c;
     if (((_c = req === null || req === void 0 ? void 0 : req.user) === null || _c === void 0 ? void 0 : _c.role) !== "subContractor")
         res.status(401).json({ message: "Oops! Unauthorized, Sub Contractor can bid only!" }); // Unauthorized
@@ -52,7 +53,27 @@ router.get("/bid", authenticate_1.default, (req, res) => __awaiter(void 0, void 
         const pageNumber = parseInt(page);
         const recordsPerPage = 10;
         const bids = yield Bid_1.default.find().limit(recordsPerPage * 1).skip((pageNumber - 1) * recordsPerPage);
-        const totalRecords = yield Bid_1.default.find().count();
+        const totalRecords = bids.length;
+        res.status(200).json({ bids, totalRecords });
+    }
+    catch (error) {
+        (0, Log_1.LogError)("/bid/:page", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}));
+// Get bids/proposal for a specific GC with pagination
+router.get("/GCbids", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d, _e;
+    if (((_d = req === null || req === void 0 ? void 0 : req.user) === null || _d === void 0 ? void 0 : _d.role) !== "generalContractor")
+        res.status(401).json({ message: "Oops! Unauthorized, General Contract can his proposals only!" }); // Unauthorized
+    try {
+        const { page } = req.query.page;
+        const pageNumber = parseInt(page);
+        const recordsPerPage = 10;
+        const generalContractor_ID = (_e = req === null || req === void 0 ? void 0 : req.user) === null || _e === void 0 ? void 0 : _e._id;
+        const postIDs = yield Post_1.default.find({ gc: generalContractor_ID }, { _id: 1 }).sort({ createdAt: 1 }).limit(recordsPerPage * 1).skip((pageNumber - 1) * recordsPerPage);
+        const bids = yield Bid_1.default.find({ post: { $in: postIDs === null || postIDs === void 0 ? void 0 : postIDs.map(obj => obj._id) } }).populate("SC").populate("post");
+        const totalRecords = bids.length;
         res.status(200).json({ bids, totalRecords });
     }
     catch (error) {
