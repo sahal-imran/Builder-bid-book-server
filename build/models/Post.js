@@ -10,6 +10,16 @@ const postSchema = new mongoose_1.default.Schema({
         ref: 'User',
         required: true
     },
+    name: {
+        type: String,
+        lowercase: true,
+        required: true
+    },
+    address: {
+        type: String,
+        lowercase: true,
+        required: true
+    },
     csiDivision: {
         type: String,
         lowercase: true,

@@ -57,4 +57,20 @@ router.get("/post/:id", authenticate, async (req: IRequest, res: Response) => {
     }
 })
 
+// get Single posts by CSI_Division
+router.post("/post/CSIDivision", authenticate, async (req: IRequest, res: Response) => {
+    try {
+        const { page }: any = req.query;
+        const pageNumber = parseInt(page)
+        const recordsPerPage = 10;
+        const filters = req.body;
+        const posts = await Post.find(filters).populate("gc").limit(recordsPerPage * 1).skip((pageNumber - 1) * recordsPerPage);
+        const totalRecords = posts.length;
+        res.status(200).json({ posts, totalRecords })
+    } catch (error) {
+        LogError("/post/CSIDivision", error)
+        res.status(500).json({ message: "Server error" })
+    }
+})
+
 export default router

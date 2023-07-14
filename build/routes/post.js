@@ -67,5 +67,21 @@ router.get("/post/:id", authenticate_1.default, (req, res) => __awaiter(void 0, 
         res.status(500).json({ message: "Server error" });
     }
 }));
+// get Single posts by CSI_Division
+router.post("/post/CSIDivision", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { page } = req.query;
+        const pageNumber = parseInt(page);
+        const recordsPerPage = 10;
+        const filters = req.body;
+        const posts = yield Post_1.default.find(filters).populate("gc").limit(recordsPerPage * 1).skip((pageNumber - 1) * recordsPerPage);
+        const totalRecords = posts.length;
+        res.status(200).json({ posts, totalRecords });
+    }
+    catch (error) {
+        (0, Log_1.LogError)("/post/CSIDivision", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}));
 exports.default = router;
 //# sourceMappingURL=post.js.map

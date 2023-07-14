@@ -19,7 +19,7 @@ router.post("/bid", authenticate, async (req: IRequest, res: Response) => {
         const subContractor_ID = req?.user?._id;
         const bid = { ...req.body, post: postId, SC: subContractor_ID }
         await Bid.create(bid);
-        res.status(201).json({ message: "Bid created successfully" })
+        res.status(201).json({ message: "Proposal posted successfully" })
     } catch (error) {
         const errorHandler: any = MongoDBErrorController(error)
         if (errorHandler?.status === 403) {

@@ -28,7 +28,7 @@ router.post("/bid", authenticate_1.default, (req, res) => __awaiter(void 0, void
         const subContractor_ID = (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b._id;
         const bid = Object.assign(Object.assign({}, req.body), { post: postId, SC: subContractor_ID });
         yield Bid_1.default.create(bid);
-        res.status(201).json({ message: "Bid created successfully" });
+        res.status(201).json({ message: "Proposal posted successfully" });
     }
     catch (error) {
         const errorHandler = (0, MongoDBErrorController_1.default)(error);

@@ -26,7 +26,7 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
-    origin: "https://builder-bid-book.vercel.app",
+    origin: MODE === "production" ? process.env.REQUEST_ORIGIN_PRODUCTION : process.env.REQUEST_ORIGIN_DEVELOPMENT,
     credentials: true, //access-control-allow-credentials:true
 }));
 // Home route
