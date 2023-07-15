@@ -7,6 +7,7 @@ import path from "path"
 import auth from './routes/auth';
 import post from './routes/post';
 import bid from './routes/bid';
+import user from './routes/user';
 
 let PORT = process.env.APP_LISTEN_PORT || 4000;
 let MODE = process.env.MODE;
@@ -43,6 +44,7 @@ mongoose
         app.use(auth);
         app.use(post);
         app.use(bid);
+        app.use(user);
     })
     .catch((err) => {
         console.log(err);
