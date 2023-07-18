@@ -69,7 +69,10 @@ router.get("/post/:id", authenticate_1.default, (req, res) => __awaiter(void 0, 
 }));
 // get Single posts by CSI_Division
 router.post("/post/CSIDivision", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
     try {
+        if (((_c = req === null || req === void 0 ? void 0 : req.user) === null || _c === void 0 ? void 0 : _c.role) !== "subContractor")
+            res.status(401).json({ message: "Oops! Not subContractor!" }); // Unauthorized
         const { page } = req.query;
         const pageNumber = parseInt(page);
         const recordsPerPage = 10;

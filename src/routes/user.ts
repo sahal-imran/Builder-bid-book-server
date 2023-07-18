@@ -13,6 +13,7 @@ interface IRequest extends Request {
 
 // Get all venders(Sub-contractors) with filters and pagination;
 router.post("/subcontractors", authenticate, async (req: IRequest, res: Response) => {
+    if (req?.user?.role !== "generalContractor") res.status(401).json({ message: "Oops! Not generalContractor" }) // Unauthorized
     try {
         const { page }: any = req.query;
         const pageNumber = parseInt(page)
@@ -32,7 +33,7 @@ router.get("/user", authenticate, async (req: IRequest, res: Response) => {
     try {
         const _id = req?.user?._id;
         const user = await User.findById({ _id });
-        res.status(200).json({user})
+        res.status(200).json({ user })
     } catch (error) {
         LogError("/user/user", error)
         res.status(500).json({ message: "Server error" })

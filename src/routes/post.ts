@@ -60,6 +60,7 @@ router.get("/post/:id", authenticate, async (req: IRequest, res: Response) => {
 // get Single posts by CSI_Division
 router.post("/post/CSIDivision", authenticate, async (req: IRequest, res: Response) => {
     try {
+        if (req?.user?.role !== "subContractor") res.status(401).json({ message: "Oops! Not subContractor!" }) // Unauthorized
         const { page }: any = req.query;
         const pageNumber = parseInt(page)
         const recordsPerPage = 10;

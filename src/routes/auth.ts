@@ -6,11 +6,14 @@ import sendMail from '../lib/sendMail';
 import Session from '../models/Session';
 import jwt from "jsonwebtoken";
 import md5 from 'md5';
-
-
+import authenticate from '../middleware/authenticate';
 
 // Instances
 const router = express.Router();
+
+interface IRequest extends Request {
+    user: any;
+}
 
 // Sign up
 router.post("/signup", async (req: Request, res: Response) => {

@@ -19,6 +19,9 @@ const User_1 = __importDefault(require("../models/User"));
 const router = express_1.default.Router();
 // Get all venders(Sub-contractors) with filters and pagination;
 router.post("/subcontractors", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    if (((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.role) !== "generalContractor")
+        res.status(401).json({ message: "Oops! Not generalContractor" }); // Unauthorized
     try {
         const { page } = req.query;
         const pageNumber = parseInt(page);
@@ -35,9 +38,9 @@ router.post("/subcontractors", authenticate_1.default, (req, res) => __awaiter(v
 }));
 // get user data by ID
 router.get("/user", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _b;
     try {
-        const _id = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a._id;
+        const _id = (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b._id;
         const user = yield User_1.default.findById({ _id });
         res.status(200).json({ user });
     }
