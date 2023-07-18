@@ -29,7 +29,20 @@ router.post("/subcontractors", authenticate_1.default, (req, res) => __awaiter(v
         res.status(200).json({ SBs, totalRecords });
     }
     catch (error) {
-        (0, Log_1.LogError)("/post/CSIDivision", error);
+        (0, Log_1.LogError)("/user/subcontractors", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}));
+// get user data by ID
+router.get("/user", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const _id = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a._id;
+        const user = yield User_1.default.findById({ _id });
+        res.status(200).json({ user });
+    }
+    catch (error) {
+        (0, Log_1.LogError)("/user/user", error);
         res.status(500).json({ message: "Server error" });
     }
 }));

@@ -58,15 +58,15 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
             const match = (0, md5_1.default)(password) === currentUser.password;
             if (match) {
                 let token = jsonwebtoken_1.default.sign({ _id: currentUser._id }, process.env.SECRET_KEY);
-                yield Session_1.default.create({ token, user: currentUser === null || currentUser === void 0 ? void 0 : currentUser._id }); // store token in Session collection which will expire in 30min
+                yield Session_1.default.create({ token, user: currentUser === null || currentUser === void 0 ? void 0 : currentUser._id, expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // store token in Session collection which will expire in 30min
                 res.cookie('jwToken', token, {
-                    maxAge: 1800000,
+                    maxAge: 86400000,
                     httpOnly: true,
                     secure: process.env.MODE === 'production',
                     sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
                 });
                 res.cookie('role', currentUser === null || currentUser === void 0 ? void 0 : currentUser.role, {
-                    maxAge: 1800000,
+                    maxAge: 86400000,
                     httpOnly: true,
                     secure: process.env.MODE === 'production',
                     sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies

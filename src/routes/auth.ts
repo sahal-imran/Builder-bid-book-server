@@ -47,15 +47,15 @@ router.post("/login", async (req: Request, res: Response) => {
             const match = md5(password) === currentUser.password;
             if (match) {
                 let token = jwt.sign({ _id: currentUser._id }, process.env.SECRET_KEY);
-                await Session.create({ token, user: currentUser?._id }); // store token in Session collection which will expire in 30min
+                await Session.create({ token, user: currentUser?._id, expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // store token in Session collection which will expire in 30min
                 res.cookie('jwToken', token, {
-                    maxAge: 1800000, // Cookie expiration time (in milliseconds)
+                    maxAge: 86400000, // Cookie expiration time (in milliseconds)
                     httpOnly: true, // Restrict cookie access to HTTP only
                     secure: process.env.MODE === 'production', // Set to true for deployment (HTTPS), false for localhost (HTTP)
                     sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
                 });
                 res.cookie('role', currentUser?.role, {
-                    maxAge: 1800000, // Cookie expiration time (in milliseconds)
+                    maxAge: 86400000, // Cookie expiration time (in milliseconds)
                     httpOnly: true, // Restrict cookie access to HTTP only
                     secure: process.env.MODE === 'production', // Set to true for deployment (HTTPS), false for localhost (HTTP)
                     sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
