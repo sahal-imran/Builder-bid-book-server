@@ -22,8 +22,10 @@ const router = express_1.default.Router();
 // Create Bid
 router.post("/bid", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
-    if (((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.role) !== "subContractor")
+    if (((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.role) !== "subContractor") {
         res.status(401).json({ message: "Oops! Unauthorized, Sub Contractor can bid only!" }); // Unauthorized
+        return;
+    }
     try {
         const { postId } = req.query;
         const subContractor_ID = (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b._id;
@@ -46,8 +48,10 @@ router.post("/bid", authenticate_1.default, (req, res) => __awaiter(void 0, void
 // Get all bids with pagination
 router.get("/bids", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _c;
-    if (((_c = req === null || req === void 0 ? void 0 : req.user) === null || _c === void 0 ? void 0 : _c.role) !== "subContractor")
+    if (((_c = req === null || req === void 0 ? void 0 : req.user) === null || _c === void 0 ? void 0 : _c.role) !== "subContractor") {
         res.status(401).json({ message: "Oops! Unauthorized, Sub Contractor can bid only!" }); // Unauthorized
+        return;
+    }
     try {
         const { page } = req.query.page;
         const pageNumber = parseInt(page);
@@ -64,8 +68,10 @@ router.get("/bids", authenticate_1.default, (req, res) => __awaiter(void 0, void
 // Get bids/proposal for a specific GC with pagination
 router.get("/GCbids", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _d, _e;
-    if (((_d = req === null || req === void 0 ? void 0 : req.user) === null || _d === void 0 ? void 0 : _d.role) !== "generalContractor")
-        res.status(401).json({ message: "Oops! Unauthorized, General Contract can his proposals only!" }); // Unauthorized
+    if (((_d = req === null || req === void 0 ? void 0 : req.user) === null || _d === void 0 ? void 0 : _d.role) !== "generalContractor") {
+        res.status(401).json({ message: "Oops! Unauthorized, General Contract can access proposals only!" }); // Unauthorized
+        return;
+    }
     try {
         const { page } = req.query.page;
         const pageNumber = parseInt(page);

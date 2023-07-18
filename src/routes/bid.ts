@@ -14,7 +14,10 @@ interface IRequest extends Request {
 
 // Create Bid
 router.post("/bid", authenticate, async (req: IRequest, res: Response) => {
-    if (req?.user?.role !== "subContractor") res.status(401).json({ message: "Oops! Unauthorized, Sub Contractor can bid only!" }) // Unauthorized
+    if (req?.user?.role !== "subContractor") {
+        res.status(401).json({ message: "Oops! Unauthorized, Sub Contractor can bid only!" }) // Unauthorized
+        return;
+    }
     try {
         const { postId }: any = req.query;
         const subContractor_ID = req?.user?._id;
@@ -36,7 +39,10 @@ router.post("/bid", authenticate, async (req: IRequest, res: Response) => {
 
 // Get all bids with pagination
 router.get("/bids", authenticate, async (req: IRequest, res: Response) => {
-    if (req?.user?.role !== "subContractor") res.status(401).json({ message: "Oops! Unauthorized, Sub Contractor can bid only!" }) // Unauthorized
+    if (req?.user?.role !== "subContractor") {
+        res.status(401).json({ message: "Oops! Unauthorized, Sub Contractor can bid only!" }) // Unauthorized
+        return;
+    }
     try {
         const { page }: any = req.query.page;
         const pageNumber = parseInt(page)
@@ -52,7 +58,10 @@ router.get("/bids", authenticate, async (req: IRequest, res: Response) => {
 
 // Get bids/proposal for a specific GC with pagination
 router.get("/GCbids", authenticate, async (req: IRequest, res: Response) => {
-    if (req?.user?.role !== "generalContractor") res.status(401).json({ message: "Oops! Unauthorized, General Contract can his proposals only!" }) // Unauthorized
+    if (req?.user?.role !== "generalContractor") {
+        res.status(401).json({ message: "Oops! Unauthorized, General Contract can access proposals only!" }) // Unauthorized
+        return;
+    }
     try {
         const { page }: any = req.query.page;
         const pageNumber = parseInt(page)

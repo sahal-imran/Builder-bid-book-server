@@ -67,7 +67,6 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 });
                 res.cookie('role', currentUser === null || currentUser === void 0 ? void 0 : currentUser.role, {
                     maxAge: 86400000,
-                    httpOnly: true,
                     secure: process.env.MODE === 'production',
                     sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
                 });
@@ -81,6 +80,20 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
     catch (error) {
         (0, Log_1.LogError)("(auth)/login", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}));
+// Logout 
+router.post("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const token = req.cookies.jwToken;
+        yield Session_1.default.findOneAndDelete({ token });
+        res.clearCookie('role');
+        res.clearCookie('jwToken');
+        res.status(200).json({ message: "logged out" });
+    }
+    catch (error) {
+        (0, Log_1.LogError)("(auth)/logout", error);
         res.status(500).json({ message: "Server error" });
     }
 }));

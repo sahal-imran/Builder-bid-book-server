@@ -20,8 +20,10 @@ const router = express_1.default.Router();
 // Get all venders(Sub-contractors) with filters and pagination;
 router.post("/subcontractors", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    if (((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.role) !== "generalContractor")
+    if (((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.role) !== "generalContractor") {
         res.status(401).json({ message: "Oops! Not generalContractor" }); // Unauthorized
+        return;
+    }
     try {
         const { page } = req.query;
         const pageNumber = parseInt(page);

@@ -21,9 +21,11 @@ const router = express_1.default.Router();
 // Create post
 router.post("/post", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
+    if (((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.role) !== "generalContractor") {
+        res.status(401).json({ message: "Oops! Unauthorized" }); // Unauthorized
+        return;
+    }
     try {
-        if (((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.role) !== "generalContractor")
-            res.status(401).json({ message: "Oops! Unauthorized" }); // Unauthorized
         const newPost = req.body;
         yield Post_1.default.create(Object.assign(Object.assign({}, newPost), { gc: (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b._id }));
         res.status(201).json({ message: "Post created successfully" });
@@ -55,8 +57,13 @@ router.get("/post", authenticate_1.default, (req, res) => __awaiter(void 0, void
         res.status(500).json({ message: "Server error" });
     }
 }));
-// get Single post by id
+// get Single post by id for sub contractor only
 router.get("/post/:id", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
+    if (((_c = req === null || req === void 0 ? void 0 : req.user) === null || _c === void 0 ? void 0 : _c.role) !== "subContractor") {
+        res.status(401).json({ message: "Oops! Not subContractor!" }); // Unauthorized
+        return;
+    }
     try {
         const { id } = req.params;
         const post = yield Post_1.default.findById({ _id: id });
@@ -67,12 +74,14 @@ router.get("/post/:id", authenticate_1.default, (req, res) => __awaiter(void 0, 
         res.status(500).json({ message: "Server error" });
     }
 }));
-// get Single posts by CSI_Division
+// get Single posts by CSI_Division for sub contractor only
 router.post("/post/CSIDivision", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
+    var _d;
+    if (((_d = req === null || req === void 0 ? void 0 : req.user) === null || _d === void 0 ? void 0 : _d.role) !== "subContractor") {
+        res.status(401).json({ message: "Oops! Not subContractor!" }); // Unauthorized
+        return;
+    }
     try {
-        if (((_c = req === null || req === void 0 ? void 0 : req.user) === null || _c === void 0 ? void 0 : _c.role) !== "subContractor")
-            res.status(401).json({ message: "Oops! Not subContractor!" }); // Unauthorized
         const { page } = req.query;
         const pageNumber = parseInt(page);
         const recordsPerPage = 10;

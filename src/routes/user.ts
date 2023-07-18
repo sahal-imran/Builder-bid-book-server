@@ -13,7 +13,10 @@ interface IRequest extends Request {
 
 // Get all venders(Sub-contractors) with filters and pagination;
 router.post("/subcontractors", authenticate, async (req: IRequest, res: Response) => {
-    if (req?.user?.role !== "generalContractor") res.status(401).json({ message: "Oops! Not generalContractor" }) // Unauthorized
+    if (req?.user?.role !== "generalContractor") {
+        res.status(401).json({ message: "Oops! Not generalContractor" }) // Unauthorized
+        return;
+    }
     try {
         const { page }: any = req.query;
         const pageNumber = parseInt(page)

@@ -6,7 +6,6 @@ import sendMail from '../lib/sendMail';
 import Session from '../models/Session';
 import jwt from "jsonwebtoken";
 import md5 from 'md5';
-import authenticate from '../middleware/authenticate';
 
 // Instances
 const router = express.Router();
@@ -59,7 +58,6 @@ router.post("/login", async (req: Request, res: Response) => {
                 });
                 res.cookie('role', currentUser?.role, {
                     maxAge: 86400000, // Cookie expiration time (in milliseconds)
-                    httpOnly: true, // Restrict cookie access to HTTP only
                     secure: process.env.MODE === 'production', // Set to true for deployment (HTTPS), false for localhost (HTTP)
                     sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
                 });
@@ -73,6 +71,20 @@ router.post("/login", async (req: Request, res: Response) => {
         res.status(500).json({ message: "Server error" })
     }
 });
+
+// Logout 
+router.post("/logout", async (req: IRequest, res: Response) => {
+    try {
+        const token: string = req.cookies.jwToken;
+        await Session.findOneAndDelete({ token });
+        res.clearCookie('role');
+        res.clearCookie('jwToken');
+        res.status(200).json({ message: "logged out" })
+    } catch (error) {
+        LogError("(auth)/logout", error)
+        res.status(500).json({ message: "Server error" })
+    }
+})
 
 
 export default router

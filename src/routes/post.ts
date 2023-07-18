@@ -12,8 +12,11 @@ interface IRequest extends Request {
 
 // Create post
 router.post("/post", authenticate, async (req: IRequest, res: Response) => {
+    if (req?.user?.role !== "generalContractor") {
+        res.status(401).json({ message: "Oops! Unauthorized" }) // Unauthorized
+        return;
+    }
     try {
-        if (req?.user?.role !== "generalContractor") res.status(401).json({ message: "Oops! Unauthorized" }) // Unauthorized
         const newPost = req.body;
         await Post.create({ ...newPost, gc: req?.user?._id });
         res.status(201).json({ message: "Post created successfully" })
@@ -45,8 +48,12 @@ router.get("/post", authenticate, async (req: IRequest, res: Response) => {
     }
 })
 
-// get Single post by id
+// get Single post by id for sub contractor only
 router.get("/post/:id", authenticate, async (req: IRequest, res: Response) => {
+    if (req?.user?.role !== "subContractor"){
+        res.status(401).json({ message: "Oops! Not subContractor!" }) // Unauthorized
+        return;
+    }
     try {
         const { id } = req.params;
         const post = await Post.findById({ _id: id })
@@ -57,10 +64,13 @@ router.get("/post/:id", authenticate, async (req: IRequest, res: Response) => {
     }
 })
 
-// get Single posts by CSI_Division
+// get Single posts by CSI_Division for sub contractor only
 router.post("/post/CSIDivision", authenticate, async (req: IRequest, res: Response) => {
+    if (req?.user?.role !== "subContractor"){
+        res.status(401).json({ message: "Oops! Not subContractor!" }) // Unauthorized
+        return;
+    }
     try {
-        if (req?.user?.role !== "subContractor") res.status(401).json({ message: "Oops! Not subContractor!" }) // Unauthorized
         const { page }: any = req.query;
         const pageNumber = parseInt(page)
         const recordsPerPage = 10;
