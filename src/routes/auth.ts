@@ -6,6 +6,8 @@ import sendMail from '../lib/sendMail';
 import Session from '../models/Session';
 import jwt from "jsonwebtoken";
 import md5 from 'md5';
+import OTPGenerator from '../utils/OtpGenerator';
+import Verification from '../models/Verification';
 
 // Instances
 const router = express.Router();
@@ -86,5 +88,59 @@ router.post("/logout", async (req: IRequest, res: Response) => {
     }
 })
 
+// Get code on email
+router.post("/getCode", async (req: IRequest, res: Response) => {
+    try {
+        const { email } = req.body;
+        const match = await User.findOne({ companyEmail: email });
+        if (!match) {
+            res.status(404).json({ message: "Email not exist" });
+            return;
+        }
+        const otp = OTPGenerator();
+        const saved = await Verification.create({ otp, user: match?._id, expireAt: new Date(Date.now() + 600000) });
+        if (saved) {
+            sendMail(match?.companyEmail, "One time OTP", `OTP: ${otp}, don't share it with anyone else`, async (error) => {
+                if (error) {
+                    LogError("(auth)/getCode", error);
+                    await Verification.findByIdAndDelete({ _id: saved._id })
+                    res.status(500).json({ message: "Unable to send otp" })
+                }
+                else {
+                    res.status(201).json({ message: "Otp sent", id: match?._id })
+                }
+            })
+        } else res.status(200).json({ message: "Unable to send otp" })
+    } catch (error) {
+        LogError("(auth)/getCode", error)
+        res.status(500).json({ message: "Server error" })
+    }
+});
 
-export default router
+// Verify OTP
+router.post("/verifyCode", async (req: IRequest, res: Response) => {
+    try {
+        const { otp, _id } = req.body;
+        const match = await Verification.findOne({ user: _id, otp })
+        if (match) res.status(200).json({ message: "Verification successful" })
+        else res.status(401).json({ message: "Expired otp" })
+    } catch (error) {
+        LogError("(auth)/verifyCode", error)
+        res.status(500).json({ message: "Server error" })
+    }
+});
+
+// Password Reset
+router.post("/resetPassword", async (req: IRequest, res: Response) => {
+    try {
+        const { password, _id } = req.body;
+        await User.findByIdAndUpdate({ _id }, { password: md5(password) });
+        res.status(200).json({ message: "Password recovered successfully" })
+    } catch (error) {
+        LogError("(auth)/resetPassword", error)
+        res.status(500).json({ message: "Server error" })
+    }
+})
+
+
+export default router;

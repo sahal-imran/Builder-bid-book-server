@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
         default: null
     },
     createdAt: { type: Date, default: new Date().toISOString() },
-    updatedAt: { type: Date, default: new Date().toISOString() },
+    updatedAt: { type: Date, default: null },
     lastUpdateBy: {
         type: mongoose.Types.ObjectId,
         ref: 'User',

@@ -20,6 +20,8 @@ const sendMail_1 = __importDefault(require("../lib/sendMail"));
 const Session_1 = __importDefault(require("../models/Session"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const md5_1 = __importDefault(require("md5"));
+const OtpGenerator_1 = __importDefault(require("../utils/OtpGenerator"));
+const Verification_1 = __importDefault(require("../models/Verification"));
 // Instances
 const router = express_1.default.Router();
 // Sign up
@@ -94,6 +96,64 @@ router.post("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
     catch (error) {
         (0, Log_1.LogError)("(auth)/logout", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}));
+// Get code on email
+router.post("/getCode", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.body;
+        const match = yield User_1.default.findOne({ companyEmail: email });
+        if (!match) {
+            res.status(404).json({ message: "Email not exist" });
+            return;
+        }
+        const otp = (0, OtpGenerator_1.default)();
+        const saved = yield Verification_1.default.create({ otp, user: match === null || match === void 0 ? void 0 : match._id, expireAt: new Date(Date.now() + 600000) });
+        if (saved) {
+            (0, sendMail_1.default)(match === null || match === void 0 ? void 0 : match.companyEmail, "One time OTP", `OTP: ${otp}, don't share it with anyone else`, (error) => __awaiter(void 0, void 0, void 0, function* () {
+                if (error) {
+                    (0, Log_1.LogError)("(auth)/getCode", error);
+                    yield Verification_1.default.findByIdAndDelete({ _id: saved._id });
+                    res.status(500).json({ message: "Unable to send otp" });
+                }
+                else {
+                    res.status(201).json({ message: "Otp sent", id: match === null || match === void 0 ? void 0 : match._id });
+                }
+            }));
+        }
+        else
+            res.status(200).json({ message: "Unable to send otp" });
+    }
+    catch (error) {
+        (0, Log_1.LogError)("(auth)/getCode", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}));
+// Verify OTP
+router.post("/verifyCode", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { otp, _id } = req.body;
+        const match = yield Verification_1.default.findOne({ user: _id, otp });
+        if (match)
+            res.status(200).json({ message: "Verification successful" });
+        else
+            res.status(401).json({ message: "Expired otp" });
+    }
+    catch (error) {
+        (0, Log_1.LogError)("(auth)/verifyCode", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}));
+// Password Reset
+router.post("/resetPassword", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { password, _id } = req.body;
+        yield User_1.default.findByIdAndUpdate({ _id }, { password: (0, md5_1.default)(password) });
+        res.status(200).json({ message: "Password recovered successfully" });
+    }
+    catch (error) {
+        (0, Log_1.LogError)("(auth)/resetPassword", error);
         res.status(500).json({ message: "Server error" });
     }
 }));
