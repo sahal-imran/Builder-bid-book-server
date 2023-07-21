@@ -107,7 +107,7 @@ router.post("/getCode", async (req: IRequest, res: Response) => {
                     res.status(500).json({ message: "Unable to send otp" })
                 }
                 else {
-                    res.status(201).json({ message: "Otp sent", id: match?._id })
+                    res.status(201).json({ message: "Otp sent", _id: match?._id })
                 }
             })
         } else res.status(200).json({ message: "Unable to send otp" })
@@ -122,8 +122,8 @@ router.post("/verifyCode", async (req: IRequest, res: Response) => {
     try {
         const { otp, _id } = req.body;
         const match = await Verification.findOne({ user: _id, otp })
-        if (match) res.status(200).json({ message: "Verification successful" })
-        else res.status(401).json({ message: "Expired otp" })
+        if (match) res.status(200).json({ message: "Verification successful", _id: match?.user });
+        else res.status(401).json({ message: "otp expired" })
     } catch (error) {
         LogError("(auth)/verifyCode", error)
         res.status(500).json({ message: "Server error" })
@@ -134,7 +134,7 @@ router.post("/verifyCode", async (req: IRequest, res: Response) => {
 router.post("/resetPassword", async (req: IRequest, res: Response) => {
     try {
         const { password, _id } = req.body;
-        await User.findByIdAndUpdate({ _id }, { password: md5(password) });
+        await User.findByIdAndUpdate({ _id }, { password: md5(password), updatedAt: new Date().toISOString(), lastUpdateBy: _id });
         res.status(200).json({ message: "Password recovered successfully" })
     } catch (error) {
         LogError("(auth)/resetPassword", error)

@@ -118,7 +118,7 @@ router.post("/getCode", (req, res) => __awaiter(void 0, void 0, void 0, function
                     res.status(500).json({ message: "Unable to send otp" });
                 }
                 else {
-                    res.status(201).json({ message: "Otp sent", id: match === null || match === void 0 ? void 0 : match._id });
+                    res.status(201).json({ message: "Otp sent", _id: match === null || match === void 0 ? void 0 : match._id });
                 }
             }));
         }
@@ -136,9 +136,9 @@ router.post("/verifyCode", (req, res) => __awaiter(void 0, void 0, void 0, funct
         const { otp, _id } = req.body;
         const match = yield Verification_1.default.findOne({ user: _id, otp });
         if (match)
-            res.status(200).json({ message: "Verification successful" });
+            res.status(200).json({ message: "Verification successful", _id: match === null || match === void 0 ? void 0 : match.user });
         else
-            res.status(401).json({ message: "Expired otp" });
+            res.status(401).json({ message: "otp expired" });
     }
     catch (error) {
         (0, Log_1.LogError)("(auth)/verifyCode", error);
@@ -149,7 +149,7 @@ router.post("/verifyCode", (req, res) => __awaiter(void 0, void 0, void 0, funct
 router.post("/resetPassword", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { password, _id } = req.body;
-        yield User_1.default.findByIdAndUpdate({ _id }, { password: (0, md5_1.default)(password) });
+        yield User_1.default.findByIdAndUpdate({ _id }, { password: (0, md5_1.default)(password), updatedAt: new Date().toISOString(), lastUpdateBy: _id });
         res.status(200).json({ message: "Password recovered successfully" });
     }
     catch (error) {
