@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import md5 from 'md5';
 import OTPGenerator from '../utils/OtpGenerator';
 import Verification from '../models/Verification';
+import authenticate from '../middleware/authenticate';
 
 // Instances
 const router = express.Router();
@@ -55,11 +56,6 @@ router.post("/login", async (req: Request, res: Response) => {
                 res.cookie('jwToken', token, {
                     maxAge: 86400000, // Cookie expiration time (in milliseconds)
                     httpOnly: true, // Restrict cookie access to HTTP only
-                    secure: process.env.MODE === 'production', // Set to true for deployment (HTTPS), false for localhost (HTTP)
-                    sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
-                });
-                res.cookie('role', currentUser?.role, {
-                    maxAge: 86400000, // Cookie expiration time (in milliseconds)
                     secure: process.env.MODE === 'production', // Set to true for deployment (HTTPS), false for localhost (HTTP)
                     sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
                 });
@@ -138,6 +134,16 @@ router.post("/resetPassword", async (req: IRequest, res: Response) => {
         res.status(200).json({ message: "Password recovered successfully" })
     } catch (error) {
         LogError("(auth)/resetPassword", error)
+        res.status(500).json({ message: "Server error" })
+    }
+})
+
+// get role for authorization
+router.get("/getRole", authenticate, async (req: IRequest, res: Response) => {
+    try {
+        res.status(200).json({ role: req?.user?.role })
+    } catch (error) {
+        LogError("(auth)/getRole", error)
         res.status(500).json({ message: "Server error" })
     }
 })

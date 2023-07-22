@@ -22,6 +22,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const md5_1 = __importDefault(require("md5"));
 const OtpGenerator_1 = __importDefault(require("../utils/OtpGenerator"));
 const Verification_1 = __importDefault(require("../models/Verification"));
+const authenticate_1 = __importDefault(require("../middleware/authenticate"));
 // Instances
 const router = express_1.default.Router();
 // Sign up
@@ -64,11 +65,6 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 res.cookie('jwToken', token, {
                     maxAge: 86400000,
                     httpOnly: true,
-                    secure: process.env.MODE === 'production',
-                    sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
-                });
-                res.cookie('role', currentUser === null || currentUser === void 0 ? void 0 : currentUser.role, {
-                    maxAge: 86400000,
                     secure: process.env.MODE === 'production',
                     sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
                 });
@@ -154,6 +150,17 @@ router.post("/resetPassword", (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
     catch (error) {
         (0, Log_1.LogError)("(auth)/resetPassword", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}));
+// get role for authorization
+router.get("/getRole", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        res.status(200).json({ role: (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.role });
+    }
+    catch (error) {
+        (0, Log_1.LogError)("(auth)/getRole", error);
         res.status(500).json({ message: "Server error" });
     }
 }));
