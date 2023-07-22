@@ -86,7 +86,6 @@ router.post("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const token = req.cookies.jwToken;
         yield Session_1.default.findOneAndDelete({ token });
-        res.clearCookie('role');
         res.clearCookie('jwToken');
         res.status(200).json({ message: "logged out" });
     }

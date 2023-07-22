@@ -75,7 +75,6 @@ router.post("/logout", async (req: IRequest, res: Response) => {
     try {
         const token: string = req.cookies.jwToken;
         await Session.findOneAndDelete({ token });
-        res.clearCookie('role');
         res.clearCookie('jwToken');
         res.status(200).json({ message: "logged out" })
     } catch (error) {
