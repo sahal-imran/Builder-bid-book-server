@@ -54,10 +54,6 @@ const userSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
-    subscription: {
-        type: Array,
-        default: null
-    },
     createdAt: { type: Date, default: new Date().toISOString() },
     updatedAt: { type: Date, default: null },
     lastUpdateBy: {

@@ -16,12 +16,13 @@ const express_1 = __importDefault(require("express"));
 const Log_1 = require("../utils/Log");
 const authenticate_1 = __importDefault(require("../middleware/authenticate"));
 const stripe_1 = __importDefault(require("stripe"));
+const Subscription_1 = __importDefault(require("../models/Subscription"));
 const stripe = new stripe_1.default(process.env.STRIPE_SECRET_kEY, {
     apiVersion: '2022-11-15'
 });
 const router = express_1.default.Router();
 router.post("/create-subscription", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f;
     const { paymentMethodId } = req.body;
     try {
         // create customer
@@ -36,20 +37,22 @@ router.post("/create-subscription", authenticate_1.default, (req, res) => __awai
         });
         // Calculate the timestamp for the current date and time
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        // Calculate the timestamp for the same date of the next month
+        // Calculate the timestamp for the 1st day of the next month
         const nextMonth = new Date();
         nextMonth.setMonth(nextMonth.getMonth() + 1);
         nextMonth.setDate(1);
         nextMonth.setHours(0, 0, 0, 0);
         const nextMonthTimestamp = Math.floor(nextMonth.getTime() / 1000);
         // Create Subscription
+        let price = ((_e = req === null || req === void 0 ? void 0 : req.user) === null || _e === void 0 ? void 0 : _e.role) === "subContractor" ? "price_1NWzjbCca3TdSJXphb19wGYu" : "price_1NX17ZCca3TdSJXpzMtMrdAf";
         const subscription = yield stripe.subscriptions.create({
             customer: customer.id,
-            items: [{ price: 'price_1NWzjbCca3TdSJXphb19wGYu' }],
-            billing_cycle_anchor: currentTimestamp,
-            trial_end: nextMonthTimestamp,
+            items: [{ price }],
+            billing_cycle_anchor: nextMonthTimestamp,
+            trial_end: currentTimestamp,
         });
-        res.status(200).json({ subscriptionId: subscription.id, Customer: customer.id });
+        yield Subscription_1.default.create({ customer, subscription, user: (_f = req === null || req === void 0 ? void 0 : req.user) === null || _f === void 0 ? void 0 : _f._id });
+        res.status(200).json({ message: "Subscribed" });
     }
     catch (error) {
         res.status(500).json({ message: error.message });
