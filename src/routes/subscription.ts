@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
-import { LogError } from '../utils/Log';
-import MongoDBErrorController from '../utils/MongoDBErrorController';
+import { LogError, LogInfo } from '../utils/Log';
 import authenticate from '../middleware/authenticate';
 import Stripe from 'stripe';
 import Subscription from '../models/Subscription';
@@ -46,11 +45,30 @@ router.post("/create-subscription", authenticate, async (req: IRequest, res: Res
             billing_cycle_anchor: nextMonthTimestamp,
             trial_end: currentTimestamp,
         });
-        await Subscription.create({ customer, subscription, user: req?.user?._id })
+        await Subscription.create({ customer: customer?.id, subscription: subscription?.id, user: req?.user?._id, status: "active" })
         res.status(200).json({ message: "Subscribed" });
     } catch (error) {
         res.status(500).json({ message: error.message });
         LogError("subscription(create-subscription)", error)
+    }
+})
+
+router.post("/cancel-subscription", authenticate, async (req: IRequest, res: Response) => {
+    const user = req?.user?._id
+    try {
+        const match = await Subscription.findOne({ user });
+        const subscriptions = await stripe.subscriptions.list({
+            customer: match?.customer?.id,
+            status: 'active', // You can also filter by other subscription statuses if needed
+        });
+        const subscriptionId = subscriptions.data[0].id;
+        const customer = subscriptions.data[0]?.customer;
+        await stripe.subscriptions.del(subscriptionId);
+        await Subscription.findOneAndUpdate({ customer, subscription: subscriptionId, status: "active" }, { status: "cancelled" })
+        res.status(200).json({ message: 'Subscription canceled successfully.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+        LogError("subscription(cancel-subscription)", error)
     }
 })
 

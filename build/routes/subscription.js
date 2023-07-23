@@ -51,12 +51,32 @@ router.post("/create-subscription", authenticate_1.default, (req, res) => __awai
             billing_cycle_anchor: nextMonthTimestamp,
             trial_end: currentTimestamp,
         });
-        yield Subscription_1.default.create({ customer, subscription, user: (_f = req === null || req === void 0 ? void 0 : req.user) === null || _f === void 0 ? void 0 : _f._id });
+        yield Subscription_1.default.create({ customer: customer === null || customer === void 0 ? void 0 : customer.id, subscription: subscription === null || subscription === void 0 ? void 0 : subscription.id, user: (_f = req === null || req === void 0 ? void 0 : req.user) === null || _f === void 0 ? void 0 : _f._id, status: "active" });
         res.status(200).json({ message: "Subscribed" });
     }
     catch (error) {
         res.status(500).json({ message: error.message });
         (0, Log_1.LogError)("subscription(create-subscription)", error);
+    }
+}));
+router.post("/cancel-subscription", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _g, _h, _j;
+    const user = (_g = req === null || req === void 0 ? void 0 : req.user) === null || _g === void 0 ? void 0 : _g._id;
+    try {
+        const match = yield Subscription_1.default.findOne({ user });
+        const subscriptions = yield stripe.subscriptions.list({
+            customer: (_h = match === null || match === void 0 ? void 0 : match.customer) === null || _h === void 0 ? void 0 : _h.id,
+            status: 'active', // You can also filter by other subscription statuses if needed
+        });
+        const subscriptionId = subscriptions.data[0].id;
+        const customer = (_j = subscriptions.data[0]) === null || _j === void 0 ? void 0 : _j.customer;
+        yield stripe.subscriptions.del(subscriptionId);
+        yield Subscription_1.default.findOneAndUpdate({ customer, subscription: subscriptionId, status: "active" }, { status: "cancelled" });
+        res.status(200).json({ message: 'Subscription canceled successfully.' });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+        (0, Log_1.LogError)("subscription(cancel-subscription)", error);
     }
 }));
 exports.default = router;
