@@ -21,6 +21,7 @@ const auth_1 = __importDefault(require("./routes/auth"));
 const post_1 = __importDefault(require("./routes/post"));
 const bid_1 = __importDefault(require("./routes/bid"));
 const user_1 = __importDefault(require("./routes/user"));
+const subscription_1 = __importDefault(require("./routes/subscription"));
 let PORT = process.env.APP_LISTEN_PORT || 4000;
 let MODE = process.env.MODE;
 const app = (0, express_1.default)();
@@ -49,6 +50,7 @@ mongoose_1.default
     app.use(post_1.default);
     app.use(bid_1.default);
     app.use(user_1.default);
+    app.use(subscription_1.default);
 })
     .catch((err) => {
     console.log(err);

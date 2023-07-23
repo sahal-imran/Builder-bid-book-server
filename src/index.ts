@@ -8,6 +8,7 @@ import auth from './routes/auth';
 import post from './routes/post';
 import bid from './routes/bid';
 import user from './routes/user';
+import subscription from './routes/subscription';
 
 let PORT = process.env.APP_LISTEN_PORT || 4000;
 let MODE = process.env.MODE;
@@ -45,6 +46,7 @@ mongoose
         app.use(post);
         app.use(bid);
         app.use(user);
+        app.use(subscription);
     })
     .catch((err) => {
         console.log(err);
