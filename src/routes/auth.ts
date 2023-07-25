@@ -9,6 +9,7 @@ import md5 from 'md5';
 import OTPGenerator from '../utils/OtpGenerator';
 import Verification from '../models/Verification';
 import authenticate from '../middleware/authenticate';
+import Subscription from '../models/Subscription';
 
 // Instances
 const router = express.Router();
@@ -139,8 +140,10 @@ router.post("/resetPassword", async (req: IRequest, res: Response) => {
 
 // get role for authorization
 router.get("/getRole", authenticate, async (req: IRequest, res: Response) => {
+    const user = req?.user?._id
     try {
-        res.status(200).json({ role: req?.user?.role })
+        const match = await Subscription.findOne({ user });
+        res.status(200).json({ role: req?.user?.role, status: !match ? null : match?.status })
     } catch (error) {
         LogError("(auth)/getRole", error)
         res.status(500).json({ message: "Server error" })

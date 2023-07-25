@@ -23,6 +23,7 @@ const md5_1 = __importDefault(require("md5"));
 const OtpGenerator_1 = __importDefault(require("../utils/OtpGenerator"));
 const Verification_1 = __importDefault(require("../models/Verification"));
 const authenticate_1 = __importDefault(require("../middleware/authenticate"));
+const Subscription_1 = __importDefault(require("../models/Subscription"));
 // Instances
 const router = express_1.default.Router();
 // Sign up
@@ -154,9 +155,11 @@ router.post("/resetPassword", (req, res) => __awaiter(void 0, void 0, void 0, fu
 }));
 // get role for authorization
 router.get("/getRole", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
+    const user = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a._id;
     try {
-        res.status(200).json({ role: (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.role });
+        const match = yield Subscription_1.default.findOne({ user });
+        res.status(200).json({ role: (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b.role, status: !match ? null : match === null || match === void 0 ? void 0 : match.status });
     }
     catch (error) {
         (0, Log_1.LogError)("(auth)/getRole", error);

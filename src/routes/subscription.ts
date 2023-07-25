@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { LogError, LogInfo } from '../utils/Log';
+import { LogError } from '../utils/Log';
 import authenticate from '../middleware/authenticate';
 import Stripe from 'stripe';
 import Subscription from '../models/Subscription';
@@ -41,9 +41,7 @@ router.post("/create-subscription", authenticate, async (req: IRequest, res: Res
         let price = req?.user?.role === "subContractor" ? "price_1NWzjbCca3TdSJXphb19wGYu" : "price_1NX17ZCca3TdSJXpzMtMrdAf"
         const subscription = await stripe.subscriptions.create({
             customer: customer.id,
-            items: [{ price }],
-            billing_cycle_anchor: nextMonthTimestamp,
-            trial_end: currentTimestamp,
+            items: [{ price }]
         });
         await Subscription.create({ customer: customer?.id, subscription: subscription?.id, user: req?.user?._id, status: "active" })
         res.status(200).json({ message: "Subscribed" });
@@ -64,12 +62,38 @@ router.post("/cancel-subscription", authenticate, async (req: IRequest, res: Res
         const subscriptionId = subscriptions.data[0].id;
         const customer = subscriptions.data[0]?.customer;
         await stripe.subscriptions.del(subscriptionId);
-        await Subscription.findOneAndUpdate({ customer, subscription: subscriptionId, status: "active" }, { status: "cancelled" })
+        match.status = 'cancelled';
+        match.updatedAt = new Date().toISOString();
+        await match.save();
         res.status(200).json({ message: 'Subscription canceled successfully.' });
     } catch (error) {
         res.status(500).json({ error: error.message });
         LogError("subscription(cancel-subscription)", error)
     }
 })
+
+router.post("/reactivate-subscription", authenticate, async (req: IRequest, res: Response) => {
+    const user = req?.user?._id
+    try {
+        const match = await Subscription.findOne({ user, status: "cancelled" });
+        if (!match) return res.status(404).json({ error: 'Subscription not found or cannot be reactivated.' });
+
+        let price = req?.user?.role === "subContractor" ? "price_1NWzjbCca3TdSJXphb19wGYu" : "price_1NX17ZCca3TdSJXpzMtMrdAf"
+        const reactivatedSubscription = await stripe.subscriptions.create({
+            customer: match?.customer,
+            items: [{ price }]
+        });
+        // Update the status of the new subscription in your local database
+        match.status = 'reactivate';
+        match.subscription = reactivatedSubscription.id; // Store the new subscription ID
+        match.updatedAt = new Date().toISOString();
+        await match.save();
+        res.status(200).json({ message: 'Subscription reactivated successfully.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+        LogError("subscription(reactivate-subscription)", error)
+    }
+})
+
 
 export default router

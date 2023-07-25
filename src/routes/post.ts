@@ -50,7 +50,7 @@ router.get("/post", authenticate, async (req: IRequest, res: Response) => {
 
 // get Single post by id for sub contractor only
 router.get("/post/:id", authenticate, async (req: IRequest, res: Response) => {
-    if (req?.user?.role !== "subContractor"){
+    if (req?.user?.role !== "subContractor") {
         res.status(401).json({ message: "Oops! Not subContractor!" }) // Unauthorized
         return;
     }
@@ -66,7 +66,7 @@ router.get("/post/:id", authenticate, async (req: IRequest, res: Response) => {
 
 // get Single posts by CSI_Division for sub contractor only
 router.post("/post/CSIDivision", authenticate, async (req: IRequest, res: Response) => {
-    if (req?.user?.role !== "subContractor"){
+    if (req?.user?.role !== "subContractor") {
         res.status(401).json({ message: "Oops! Not subContractor!" }) // Unauthorized
         return;
     }

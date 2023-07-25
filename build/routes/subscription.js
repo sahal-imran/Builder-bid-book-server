@@ -47,9 +47,7 @@ router.post("/create-subscription", authenticate_1.default, (req, res) => __awai
         let price = ((_e = req === null || req === void 0 ? void 0 : req.user) === null || _e === void 0 ? void 0 : _e.role) === "subContractor" ? "price_1NWzjbCca3TdSJXphb19wGYu" : "price_1NX17ZCca3TdSJXpzMtMrdAf";
         const subscription = yield stripe.subscriptions.create({
             customer: customer.id,
-            items: [{ price }],
-            billing_cycle_anchor: nextMonthTimestamp,
-            trial_end: currentTimestamp,
+            items: [{ price }]
         });
         yield Subscription_1.default.create({ customer: customer === null || customer === void 0 ? void 0 : customer.id, subscription: subscription === null || subscription === void 0 ? void 0 : subscription.id, user: (_f = req === null || req === void 0 ? void 0 : req.user) === null || _f === void 0 ? void 0 : _f._id, status: "active" });
         res.status(200).json({ message: "Subscribed" });
@@ -71,12 +69,38 @@ router.post("/cancel-subscription", authenticate_1.default, (req, res) => __awai
         const subscriptionId = subscriptions.data[0].id;
         const customer = (_j = subscriptions.data[0]) === null || _j === void 0 ? void 0 : _j.customer;
         yield stripe.subscriptions.del(subscriptionId);
-        yield Subscription_1.default.findOneAndUpdate({ customer, subscription: subscriptionId, status: "active" }, { status: "cancelled" });
+        match.status = 'cancelled';
+        match.updatedAt = new Date().toISOString();
+        yield match.save();
         res.status(200).json({ message: 'Subscription canceled successfully.' });
     }
     catch (error) {
         res.status(500).json({ error: error.message });
         (0, Log_1.LogError)("subscription(cancel-subscription)", error);
+    }
+}));
+router.post("/reactivate-subscription", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _k, _l;
+    const user = (_k = req === null || req === void 0 ? void 0 : req.user) === null || _k === void 0 ? void 0 : _k._id;
+    try {
+        const match = yield Subscription_1.default.findOne({ user, status: "cancelled" });
+        if (!match)
+            return res.status(404).json({ error: 'Subscription not found or cannot be reactivated.' });
+        let price = ((_l = req === null || req === void 0 ? void 0 : req.user) === null || _l === void 0 ? void 0 : _l.role) === "subContractor" ? "price_1NWzjbCca3TdSJXphb19wGYu" : "price_1NX17ZCca3TdSJXpzMtMrdAf";
+        const reactivatedSubscription = yield stripe.subscriptions.create({
+            customer: match === null || match === void 0 ? void 0 : match.customer,
+            items: [{ price }]
+        });
+        // Update the status of the new subscription in your local database
+        match.status = 'reactivate';
+        match.subscription = reactivatedSubscription.id; // Store the new subscription ID
+        match.updatedAt = new Date().toISOString();
+        yield match.save();
+        res.status(200).json({ message: 'Subscription reactivated successfully.' });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+        (0, Log_1.LogError)("subscription(reactivate-subscription)", error);
     }
 }));
 exports.default = router;
