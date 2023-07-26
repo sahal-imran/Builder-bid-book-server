@@ -60,6 +60,12 @@ router.post("/login", async (req: Request, res: Response) => {
                     secure: process.env.MODE === 'production', // Set to true for deployment (HTTPS), false for localhost (HTTP)
                     sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
                 });
+                res.cookie('role', currentUser?.role, {
+                    maxAge: 86400000, // Cookie expiration time (in milliseconds)
+                    // httpOnly: true, // Restrict cookie access to HTTP only
+                    // secure: process.env.MODE === 'production', // Set to true for deployment (HTTPS), false for localhost (HTTP)
+                    // sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
+                });
                 res.status(200).json({ message: "successfully logged in", role: currentUser?.role })
             }
             else res.status(401).json({ message: "Invalid password" }) // Unauthorized
