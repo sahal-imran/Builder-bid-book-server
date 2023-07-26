@@ -67,7 +67,7 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 // Logout 
-router.post("/logout", async (req: IRequest, res: Response) => {
+router.post("/logout", authenticate, async (req: IRequest, res: Response) => {
     try {
         await Session.findOneAndDelete({ user: req?.user?._id });
         res.status(200).json({ message: "logged out" })

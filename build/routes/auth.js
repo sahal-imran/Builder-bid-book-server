@@ -22,6 +22,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const md5_1 = __importDefault(require("md5"));
 const OtpGenerator_1 = __importDefault(require("../utils/OtpGenerator"));
 const Verification_1 = __importDefault(require("../models/Verification"));
+const authenticate_1 = __importDefault(require("../middleware/authenticate"));
 const Subscription_1 = __importDefault(require("../models/Subscription"));
 // Instances
 const router = express_1.default.Router();
@@ -77,7 +78,7 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 }));
 // Logout 
-router.post("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/logout", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         yield Session_1.default.findOneAndDelete({ user: (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a._id });
