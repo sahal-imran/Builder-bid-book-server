@@ -48,25 +48,14 @@ router.post("/signup", async (req: Request, res: Response) => {
 router.post("/login", async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
-        const currentUser = await User.findOne({ companyEmail: email })
+        const currentUser = await User.findOne({ companyEmail: email });
+        const subscription = await Subscription.findOne({ user: currentUser?._id });
         if (currentUser) {
             const match = md5(password) === currentUser.password;
             if (match) {
                 let token = jwt.sign({ _id: currentUser._id }, process.env.SECRET_KEY);
-                await Session.create({ token, user: currentUser?._id, expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // store token in Session collection which will expire in 30min
-                res.cookie('jwToken', token, {
-                    maxAge: 86400000, // Cookie expiration time (in milliseconds)
-                    httpOnly: true, // Restrict cookie access to HTTP only
-                    secure: process.env.MODE === 'production', // Set to true for deployment (HTTPS), false for localhost (HTTP)
-                    sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
-                });
-                res.cookie('role', currentUser?.role, {
-                    maxAge: 86400000, // Cookie expiration time (in milliseconds)
-                    // httpOnly: true, // Restrict cookie access to HTTP only
-                    // secure: process.env.MODE === 'production', // Set to true for deployment (HTTPS), false for localhost (HTTP)
-                    // sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
-                });
-                res.status(200).json({ message: "successfully logged in", role: currentUser?.role })
+                await Session.create({ token, user: currentUser?._id, expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // store token in Session collection which will expire in 1 day
+                res.status(200).json({ message: "successfully logged in", user: { role: currentUser?.role, status: subscription ? subscription?.status : null, token } })
             }
             else res.status(401).json({ message: "Invalid password" }) // Unauthorized
         }
@@ -80,9 +69,7 @@ router.post("/login", async (req: Request, res: Response) => {
 // Logout 
 router.post("/logout", async (req: IRequest, res: Response) => {
     try {
-        const token: string = req.cookies.jwToken;
-        await Session.findOneAndDelete({ token });
-        res.clearCookie('jwToken');
+        await Session.findOneAndDelete({ user: req?.user?._id });
         res.status(200).json({ message: "logged out" })
     } catch (error) {
         LogError("(auth)/logout", error)
@@ -140,18 +127,6 @@ router.post("/resetPassword", async (req: IRequest, res: Response) => {
         res.status(200).json({ message: "Password recovered successfully" })
     } catch (error) {
         LogError("(auth)/resetPassword", error)
-        res.status(500).json({ message: "Server error" })
-    }
-})
-
-// get role for authorization
-router.get("/getRole", authenticate, async (req: IRequest, res: Response) => {
-    const user = req?.user?._id
-    try {
-        const match = await Subscription.findOne({ user });
-        res.status(200).json({ role: req?.user?.role, status: !match ? null : match?.status })
-    } catch (error) {
-        LogError("(auth)/getRole", error)
         res.status(500).json({ message: "Server error" })
     }
 })

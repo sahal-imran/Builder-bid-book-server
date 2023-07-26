@@ -22,7 +22,6 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const md5_1 = __importDefault(require("md5"));
 const OtpGenerator_1 = __importDefault(require("../utils/OtpGenerator"));
 const Verification_1 = __importDefault(require("../models/Verification"));
-const authenticate_1 = __importDefault(require("../middleware/authenticate"));
 const Subscription_1 = __importDefault(require("../models/Subscription"));
 // Instances
 const router = express_1.default.Router();
@@ -58,24 +57,13 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const { email, password } = req.body;
         const currentUser = yield User_1.default.findOne({ companyEmail: email });
+        const subscription = yield Subscription_1.default.findOne({ user: currentUser === null || currentUser === void 0 ? void 0 : currentUser._id });
         if (currentUser) {
             const match = (0, md5_1.default)(password) === currentUser.password;
             if (match) {
                 let token = jsonwebtoken_1.default.sign({ _id: currentUser._id }, process.env.SECRET_KEY);
-                yield Session_1.default.create({ token, user: currentUser === null || currentUser === void 0 ? void 0 : currentUser._id, expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // store token in Session collection which will expire in 30min
-                res.cookie('jwToken', token, {
-                    maxAge: 86400000,
-                    httpOnly: true,
-                    secure: process.env.MODE === 'production',
-                    sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
-                });
-                res.cookie('role', currentUser === null || currentUser === void 0 ? void 0 : currentUser.role, {
-                    maxAge: 86400000, // Cookie expiration time (in milliseconds)
-                    // httpOnly: true, // Restrict cookie access to HTTP only
-                    // secure: process.env.MODE === 'production', // Set to true for deployment (HTTPS), false for localhost (HTTP)
-                    // sameSite: process.env.MODE === 'production' ? 'none' : 'lax', // Set to 'Lax' for localhost, 'none' for deployment to allow cross-site cookies
-                });
-                res.status(200).json({ message: "successfully logged in", role: currentUser === null || currentUser === void 0 ? void 0 : currentUser.role });
+                yield Session_1.default.create({ token, user: currentUser === null || currentUser === void 0 ? void 0 : currentUser._id, expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // store token in Session collection which will expire in 1 day
+                res.status(200).json({ message: "successfully logged in", user: { role: currentUser === null || currentUser === void 0 ? void 0 : currentUser.role, status: subscription ? subscription === null || subscription === void 0 ? void 0 : subscription.status : null, token } });
             }
             else
                 res.status(401).json({ message: "Invalid password" }); // Unauthorized
@@ -90,10 +78,9 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 // Logout 
 router.post("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        const token = req.cookies.jwToken;
-        yield Session_1.default.findOneAndDelete({ token });
-        res.clearCookie('jwToken');
+        yield Session_1.default.findOneAndDelete({ user: (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a._id });
         res.status(200).json({ message: "logged out" });
     }
     catch (error) {
@@ -156,19 +143,6 @@ router.post("/resetPassword", (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
     catch (error) {
         (0, Log_1.LogError)("(auth)/resetPassword", error);
-        res.status(500).json({ message: "Server error" });
-    }
-}));
-// get role for authorization
-router.get("/getRole", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    const user = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a._id;
-    try {
-        const match = yield Subscription_1.default.findOne({ user });
-        res.status(200).json({ role: (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b.role, status: !match ? null : match === null || match === void 0 ? void 0 : match.status });
-    }
-    catch (error) {
-        (0, Log_1.LogError)("(auth)/getRole", error);
         res.status(500).json({ message: "Server error" });
     }
 }));

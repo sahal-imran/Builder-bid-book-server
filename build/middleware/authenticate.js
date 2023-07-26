@@ -16,8 +16,12 @@ const Log_1 = require("../utils/Log");
 const Session_1 = __importDefault(require("../models/Session"));
 const MongoDBErrorController_1 = __importDefault(require("../utils/MongoDBErrorController"));
 const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+        req.token = authHeader.split(" ")[1]; // Extract the token from the header
+    }
     try {
-        const token = req.cookies.jwToken;
+        const token = req.token;
         const found = yield Session_1.default.findOne({ token }).populate("user");
         if (found) {
             req.user = found === null || found === void 0 ? void 0 : found.user;

@@ -1,16 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
 import { LogError, LogInfo, LogWarning } from '../utils/Log';
 import Session from '../models/Session';
-import User from '../models/User';
 import MongoDBErrorController from '../utils/MongoDBErrorController';
 
 interface IRequest extends Request {
-    user: any;
+    token: any;
+    user: any
 }
 
 const authenticate = async (req: IRequest, res: Response, next: NextFunction) => {
+    const authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+        req.token = authHeader.split(" ")[1]; // Extract the token from the header
+    }
     try {
-        const token: string = req.cookies.jwToken;
+        const token: string = req.token;
         const found: any = await Session.findOne({ token }).populate("user");
         if (found) {
             req.user = found?.user
