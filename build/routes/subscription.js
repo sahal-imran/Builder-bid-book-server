@@ -86,7 +86,7 @@ router.post("/reactivate-subscription", authenticate_1.default, (req, res) => __
         const match = yield Subscription_1.default.findOne({ user, status: "cancelled" });
         if (!match)
             return res.status(404).json({ error: 'Subscription not found or cannot be reactivated.' });
-        let price = ((_l = req === null || req === void 0 ? void 0 : req.user) === null || _l === void 0 ? void 0 : _l.role) === "subContractor" ? "price_1NWzjbCca3TdSJXphb19wGYu" : "price_1NX17ZCca3TdSJXpzMtMrdAf";
+        let price = ((_l = req === null || req === void 0 ? void 0 : req.user) === null || _l === void 0 ? void 0 : _l.role) === "subContractor" ? process.env.SUBCONTRACTOR_PRODUCT_ID : process.env.GENERAL_CONTRACTOR_PRODUCT_ID;
         const reactivatedSubscription = yield stripe.subscriptions.create({
             customer: match === null || match === void 0 ? void 0 : match.customer,
             items: [{ price }]

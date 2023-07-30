@@ -78,7 +78,7 @@ router.post("/reactivate-subscription", authenticate, async (req: IRequest, res:
         const match = await Subscription.findOne({ user, status: "cancelled" });
         if (!match) return res.status(404).json({ error: 'Subscription not found or cannot be reactivated.' });
 
-        let price = req?.user?.role === "subContractor" ? "price_1NWzjbCca3TdSJXphb19wGYu" : "price_1NX17ZCca3TdSJXpzMtMrdAf"
+        let price = req?.user?.role === "subContractor" ? process.env.SUBCONTRACTOR_PRODUCT_ID : process.env.GENERAL_CONTRACTOR_PRODUCT_ID
         const reactivatedSubscription = await stripe.subscriptions.create({
             customer: match?.customer,
             items: [{ price }]
