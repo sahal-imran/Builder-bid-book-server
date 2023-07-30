@@ -44,7 +44,7 @@ router.post("/create-subscription", authenticate_1.default, (req, res) => __awai
         nextMonth.setHours(0, 0, 0, 0);
         const nextMonthTimestamp = Math.floor(nextMonth.getTime() / 1000);
         // Create Subscription
-        let price = ((_e = req === null || req === void 0 ? void 0 : req.user) === null || _e === void 0 ? void 0 : _e.role) === "subContractor" ? "price_1NWzjbCca3TdSJXphb19wGYu" : "price_1NX17ZCca3TdSJXpzMtMrdAf";
+        let price = ((_e = req === null || req === void 0 ? void 0 : req.user) === null || _e === void 0 ? void 0 : _e.role) === "subContractor" ? process.env.SUBCONTRACTOR_PRODUCT_ID : process.env.GENERAL_CONTRACTOR_PRODUCT_ID;
         const subscription = yield stripe.subscriptions.create({
             customer: customer.id,
             items: [{ price }]

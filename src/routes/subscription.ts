@@ -38,7 +38,7 @@ router.post("/create-subscription", authenticate, async (req: IRequest, res: Res
         const nextMonthTimestamp = Math.floor(nextMonth.getTime() / 1000);
 
         // Create Subscription
-        let price = req?.user?.role === "subContractor" ? "price_1NWzjbCca3TdSJXphb19wGYu" : "price_1NX17ZCca3TdSJXpzMtMrdAf"
+        let price = req?.user?.role === "subContractor" ? process.env.SUBCONTRACTOR_PRODUCT_ID : process.env.GENERAL_CONTRACTOR_PRODUCT_ID
         const subscription = await stripe.subscriptions.create({
             customer: customer.id,
             items: [{ price }]
