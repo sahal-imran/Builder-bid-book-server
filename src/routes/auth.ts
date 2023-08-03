@@ -54,7 +54,7 @@ router.post("/login", async (req: Request, res: Response) => {
             const match = md5(password) === currentUser.password;
             if (match) {
                 let token = jwt.sign({ _id: currentUser._id }, process.env.SECRET_KEY);
-                await Session.create({ token, user: currentUser?._id, expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // store token in Session collection which will expire in 1 day
+                await Session.create({ token, user: currentUser?._id }); // store token in Session collection which will expire in 1 day
                 res.status(200).json({ message: "successfully logged in", user: { role: currentUser?.role, status: subscription ? subscription?.status : null, token } })
             }
             else res.status(401).json({ message: "Invalid password" }) // Unauthorized
@@ -87,7 +87,7 @@ router.post("/getCode", async (req: IRequest, res: Response) => {
             return;
         }
         const otp = OTPGenerator();
-        const saved = await Verification.create({ otp, user: match?._id, expireAt: new Date(Date.now() + 600000) });
+        const saved = await Verification.create({ otp, user: match?._id, expireAt: new Date(Date.now() + 36000) });
         if (saved) {
             sendMail(match?.companyEmail, "One time OTP", `OTP: ${otp}, don't share it with anyone else`, async (error) => {
                 if (error) {

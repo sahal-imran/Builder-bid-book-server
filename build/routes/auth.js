@@ -63,7 +63,7 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
             const match = (0, md5_1.default)(password) === currentUser.password;
             if (match) {
                 let token = jsonwebtoken_1.default.sign({ _id: currentUser._id }, process.env.SECRET_KEY);
-                yield Session_1.default.create({ token, user: currentUser === null || currentUser === void 0 ? void 0 : currentUser._id, expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // store token in Session collection which will expire in 1 day
+                yield Session_1.default.create({ token, user: currentUser === null || currentUser === void 0 ? void 0 : currentUser._id }); // store token in Session collection which will expire in 1 day
                 res.status(200).json({ message: "successfully logged in", user: { role: currentUser === null || currentUser === void 0 ? void 0 : currentUser.role, status: subscription ? subscription === null || subscription === void 0 ? void 0 : subscription.status : null, token } });
             }
             else
@@ -99,7 +99,7 @@ router.post("/getCode", (req, res) => __awaiter(void 0, void 0, void 0, function
             return;
         }
         const otp = (0, OtpGenerator_1.default)();
-        const saved = yield Verification_1.default.create({ otp, user: match === null || match === void 0 ? void 0 : match._id, expireAt: new Date(Date.now() + 600000) });
+        const saved = yield Verification_1.default.create({ otp, user: match === null || match === void 0 ? void 0 : match._id, expireAt: new Date(Date.now() + 36000) });
         if (saved) {
             (0, sendMail_1.default)(match === null || match === void 0 ? void 0 : match.companyEmail, "One time OTP", `OTP: ${otp}, don't share it with anyone else`, (error) => __awaiter(void 0, void 0, void 0, function* () {
                 if (error) {

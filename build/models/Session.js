@@ -16,7 +16,8 @@ const sessionSchema = new mongoose_1.default.Schema({
     },
     expireAt: {
         type: Date,
-        index: { expires: '1d' } // Set the expiration time here, '30m'
+        default: Date.now,
+        index: { expires: '1h' }
     }
 });
 const Session = mongoose_1.default.models.Session || mongoose_1.default.model("Session", sessionSchema);

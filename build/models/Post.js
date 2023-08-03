@@ -44,6 +44,9 @@ const postSchema = new mongoose_1.default.Schema({
         type: mongoose_1.default.Types.ObjectId,
         ref: 'User',
         default: null,
+    },
+    expireAt: {
+        type: Date
     }
 });
 const Post = mongoose_1.default.models.Post || mongoose_1.default.model("Post", postSchema);

@@ -27,7 +27,7 @@ router.post("/post", authenticate_1.default, (req, res) => __awaiter(void 0, voi
     }
     try {
         const newPost = req.body;
-        yield Post_1.default.create(Object.assign(Object.assign({}, newPost), { gc: (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b._id }));
+        yield Post_1.default.create(Object.assign(Object.assign({}, newPost), { gc: (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b._id, expireAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) }));
         res.status(201).json({ message: "Post created successfully" });
     }
     catch (error) {

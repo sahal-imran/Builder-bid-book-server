@@ -40,6 +40,9 @@ const postSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: 'User',
         default: null,
+    },
+    expireAt: {
+        type: Date
     }
 });
 

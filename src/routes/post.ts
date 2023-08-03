@@ -18,7 +18,7 @@ router.post("/post", authenticate, async (req: IRequest, res: Response) => {
     }
     try {
         const newPost = req.body;
-        await Post.create({ ...newPost, gc: req?.user?._id });
+        await Post.create({ ...newPost, gc: req?.user?._id, expireAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) });
         res.status(201).json({ message: "Post created successfully" })
     } catch (error) {
         const errorHandler: any = MongoDBErrorController(error)
