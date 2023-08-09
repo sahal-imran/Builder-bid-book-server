@@ -23,7 +23,38 @@ router.post("/signup", async (req: Request, res: Response) => {
     try {
         const body = req.body;
         const createUser = await User.create({ ...body, password: md5(body.password) });
-        sendMail(createUser?.companyEmail, "Welcome", "Hi Welcome to the app", (error) => {
+        sendMail(createUser?.companyEmail, "Welcome to www.buildersbidbook.com", `
+        Thank you for subscribing to Builder Bid Book, your ultimate platform for staying updated on the latest
+        construction projects and opportunities! We are thrilled to have you on board, and we can’t wait to help
+        you navigate the world of construction bidding.
+
+        Builder Bid Book was created with a mission to simplify the process of finding and bidding on
+        construction projects. Whether you’re a contractor, subcontractor, supplier, or consultant, our platform is
+        designed to connect you with relevant projects that match your expertise and interests.
+
+        Here’s what you can expect from your Builder Bid Book subscription:
+            Stay informed about new and relevant construction projects in your preferred locations and
+             industries.
+           -> Access a wide range of bidding opportunities and RFPs (Request for Proposals) to expand your
+              business prospects.
+           -> Connect with other professionals in the construction industry, fostering potential collaborations
+              and partnerships.
+           -> Our platform is intuitive and user-friendly, ensuring a seamless experience as you navigate
+              through projects and opportunities.
+
+             If you have any questions or need assistance at any point during your subscription, our
+             dedicated support team is here to help. Simply reach out to us at builderbidbook@gmail.com,
+             and we’ll be more than happy to assist you.
+
+             Again, welcome to Builder Bid Book! We are excited to have you join our community of
+             construction enthusiasts and professionals. Start exploring projects, connecting with other
+             members, and making the most of your subscription today!
+
+             How to use buildersbidbook?
+             https://res.cloudinary.com/dqkxspfhw/image/upload/v1691083463/how%20to%20use%20buildersbidbook/Instructions_to_Builders_Bid_Book_p3eyzk.pdf
+
+        Best regards,
+        Builder Bid Book Team`, (error) => {
             if (error) LogError("/signup(sendMail)", error)
             res.status(201).json({ message: "Registered" })
         })
