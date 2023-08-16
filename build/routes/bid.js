@@ -78,7 +78,7 @@ router.get("/GCbids", authenticate_1.default, (req, res) => __awaiter(void 0, vo
         const recordsPerPage = 10;
         const generalContractor_ID = (_e = req === null || req === void 0 ? void 0 : req.user) === null || _e === void 0 ? void 0 : _e._id;
         const postIDs = yield Post_1.default.find({ gc: generalContractor_ID }, { _id: 1 }).sort({ createdAt: 1 }).limit(recordsPerPage * 1).skip((pageNumber - 1) * recordsPerPage);
-        const bids = yield Bid_1.default.find({ post: { $in: postIDs === null || postIDs === void 0 ? void 0 : postIDs.map(obj => obj._id) } }).populate("SC").populate("post");
+        const bids = yield Bid_1.default.find({ post: { $in: postIDs === null || postIDs === void 0 ? void 0 : postIDs.map(obj => obj._id) } }).populate("SC").populate("post").sort({ createdAt: -1 });
         const totalRecords = bids.length;
         res.status(200).json({ bids, totalRecords });
     }

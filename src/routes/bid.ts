@@ -68,7 +68,7 @@ router.get("/GCbids", authenticate, async (req: IRequest, res: Response) => {
         const recordsPerPage = 10;
         const generalContractor_ID = req?.user?._id;
         const postIDs = await Post.find({ gc: generalContractor_ID }, { _id: 1 }).sort({ createdAt: 1 }).limit(recordsPerPage * 1).skip((pageNumber - 1) * recordsPerPage);
-        const bids = await Bid.find({ post: { $in: postIDs?.map(obj => obj._id) } }).populate("SC").populate("post");
+        const bids = await Bid.find({ post: { $in: postIDs?.map(obj => obj._id) } }).populate("SC").populate("post").sort({ createdAt: -1 });
         const totalRecords = bids.length;
         res.status(200).json({ bids, totalRecords })
     } catch (error) {

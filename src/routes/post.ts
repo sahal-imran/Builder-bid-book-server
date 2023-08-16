@@ -56,7 +56,7 @@ router.get("/post/:id", authenticate, async (req: IRequest, res: Response) => {
     }
     try {
         const { id } = req.params;
-        const post = await Post.findById({ _id: id })
+        const post = await Post.findById({ _id: id }).populate("gc")
         res.status(200).json({ post })
     } catch (error) {
         LogError("/postById/:id", error)

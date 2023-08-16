@@ -66,7 +66,7 @@ router.get("/post/:id", authenticate_1.default, (req, res) => __awaiter(void 0, 
     }
     try {
         const { id } = req.params;
-        const post = yield Post_1.default.findById({ _id: id });
+        const post = yield Post_1.default.findById({ _id: id }).populate("gc");
         res.status(200).json({ post });
     }
     catch (error) {
