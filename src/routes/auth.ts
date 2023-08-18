@@ -43,7 +43,7 @@ router.post("/signup", async (req: Request, res: Response) => {
               through projects and opportunities.
 
              If you have any questions or need assistance at any point during your subscription, our
-             dedicated support team is here to help. Simply reach out to us at builderbidbook@gmail.com,
+             dedicated support team is here to help. Simply reach out to us at buildersbidbook@gmail.com,
              and we’ll be more than happy to assist you.
 
              Again, welcome to Builder Bid Book! We are excited to have you join our community of
