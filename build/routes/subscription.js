@@ -23,7 +23,7 @@ const stripe = new stripe_1.default(process.env.STRIPE_SECRET_kEY, {
 const router = express_1.default.Router();
 router.post("/create-subscription", authenticate_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f;
-    const { paymentMethodId } = req.body;
+    const { paymentMethodId, coupon } = req.body;
     try {
         // create customer
         const customer = yield stripe.customers.create({
@@ -47,7 +47,8 @@ router.post("/create-subscription", authenticate_1.default, (req, res) => __awai
         let price = ((_e = req === null || req === void 0 ? void 0 : req.user) === null || _e === void 0 ? void 0 : _e.role) === "subContractor" ? process.env.SUBCONTRACTOR_PRODUCT_ID : process.env.GENERAL_CONTRACTOR_PRODUCT_ID;
         const subscription = yield stripe.subscriptions.create({
             customer: customer.id,
-            items: [{ price }]
+            items: [{ price }],
+            coupon
         });
         yield Subscription_1.default.create({ customer: customer === null || customer === void 0 ? void 0 : customer.id, subscription: subscription === null || subscription === void 0 ? void 0 : subscription.id, user: (_f = req === null || req === void 0 ? void 0 : req.user) === null || _f === void 0 ? void 0 : _f._id, status: "active" });
         res.status(200).json({ message: "Subscribed" });

@@ -15,7 +15,7 @@ interface IRequest extends Request {
 }
 
 router.post("/create-subscription", authenticate, async (req: IRequest, res: Response) => {
-    const { paymentMethodId } = req.body;
+    const { paymentMethodId, coupon } = req.body;
     try {
         // create customer
         const customer = await stripe.customers.create({
@@ -41,7 +41,8 @@ router.post("/create-subscription", authenticate, async (req: IRequest, res: Res
         let price = req?.user?.role === "subContractor" ? process.env.SUBCONTRACTOR_PRODUCT_ID : process.env.GENERAL_CONTRACTOR_PRODUCT_ID
         const subscription = await stripe.subscriptions.create({
             customer: customer.id,
-            items: [{ price }]
+            items: [{ price }],
+            coupon
         });
         await Subscription.create({ customer: customer?.id, subscription: subscription?.id, user: req?.user?._id, status: "active" })
         res.status(200).json({ message: "Subscribed" });
